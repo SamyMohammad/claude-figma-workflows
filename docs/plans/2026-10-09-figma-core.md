@@ -10,7 +10,7 @@
 
 **Spec:** `docs/specs/2026-10-09-figma-workflows-design.md`, approved by the owner on 2026-10-09.
 
-**Status:** Awaiting review of this implementation plan. No runtime code has been written.
+**Status:** Approved by the owner on 2026-10-09. Execution in progress using subagent-driven development.
 
 ## Global constraints
 
@@ -63,7 +63,7 @@ These make the approved spec executable; review them with this plan.
 - **Approvals:** approval files record owner, chat/message evidence reference, UTC timestamp and content hash; they are auditable records, not cryptographic proof of a person's identity. Only create them after explicit owner approval. Tests use clearly labeled synthetic approval evidence.
 - **Hooks:** platform-specific literal checks and golden command hooks belong to adapter milestones because no platform code exists here. Core implements reusable approval validation and an independent CLI check; this milestone makes no hook-enforcement claim.
 
-## C1 — Runtime and a failing-test harness
+## Task 1: C1 — Runtime and a failing-test harness
 
 **Files:** create `pyproject.toml`, `requirements-core.lock`, `plugins/figma-core/scripts/figma_core/__init__.py`, `plugins/figma-core/scripts/figma_core/errors.py`, `tests/scripts/test_errors.py`; update `.gitignore` for build/test outputs.
 
@@ -109,7 +109,7 @@ class CoreError(ValueError):
 
 - [ ] Rerun the test, require PASS, then commit only task files with `chore(core): establish tested Python runtime`.
 
-## C2 — Bundle schemas and synthetic fixture
+## Task 2: C2 — Bundle schemas and synthetic fixture
 
 **Files:** create `scripts/figma_core/documents.py` and `scripts/figma_core/schema.py` under the core plugin; create its `schemas/{manifest,meta,fonts,component-map,assets,approval,comparison-policy}.schema.json`; create `tests/fixtures/core-v1/`, `tests/fixtures/make_core_fixture.py`, `tests/scripts/test_schema.py`; create `docs/adr/001-shared-core.md` and `docs/adr/002-token-contract.md`.
 
@@ -181,7 +181,7 @@ Validate cross-document uniqueness and `logicalSize * scale == pixelSize` within
 - [ ] Build reproducible fixture images with Pillow rectangles: two 100x100 screens and three 20x20 components. No text means `fonts=[]` and `fontHashes={}` are legitimate. Use synthetic source IDs and a README explicitly stating these are not Figma exports. Include one sRGB color, px spacing, and typography tokens as data without pretending the fixture renders typography. Use the same semantic paths in light/dark and a shared base spacing alias. Record all file hashes excluding the manifest itself.
 - [ ] Add cases for missing meta field, duplicate node IDs, bad hash syntax, NaN, unknown properties, and logical/pixel inconsistency; rerun C1/C2 tests and commit with `feat(core): define versioned design bundle contract`.
 
-## C3 — Safe storage, checkpoint/resume, budget ledger
+## Task 3: C3 — Safe storage, checkpoint/resume, budget ledger
 
 **Files:** create core modules `paths.py`, `storage.py`, `checkpoint.py`, `budget.py`; create `tests/scripts/test_storage.py`, `test_checkpoint.py`, `test_budget.py`; extend C2 bundle validation to verify hashes; create `docs/adr/003-cache-and-budget.md`.
 
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS reservations (
 Use a configured busy timeout; `BEGIN IMMEDIATE`, count all states in the window, insert only below limit, commit. Repeating reserve for an existing reserved request returns true without inserting; an already sent request returns false. Another window using that ID is an error. `mark_sent` changes exactly one reserved row to sent in a transaction and raises for missing/already-sent IDs; only its successful caller may dispatch. Record dispatch before calling MCP. An ambiguous failed dispatch consumes its reservation. Inject window IDs; do not infer a new daily quota from local wall time.
 - [ ] Add crash tests by monkeypatching `os.replace` to raise, missing-reference checkpoint tests, known/changed revision reuse tests, duplicate reservation tests, and a spawned-process concurrency test. Test junction/symlink escapes where creation is supported; report skips explicitly on hosts lacking that permission. Rerun C1–C3 tests, then commit with `feat(core): persist safe resumable extraction state`.
 
-## C4 — Exact token audit and hash-bound approval
+## Task 4: C4 — Exact token audit and hash-bound approval
 
 **Files:** create core `tokens.py`, `token_types.py`, `approvals.py`; create `tests/scripts/test_tokens.py`, `test_approvals.py`; create `plugins/figma-core/skills/token-audit/SKILL.md` in C7 using this contract, not during this task.
 
@@ -285,7 +285,7 @@ def content_hash(value: dict) -> str:
 `require_approval` first validates the C2 approval schema, then kind/hash and selected modes. JSON key reordering retains approval; semantic/value changes do not. Validate owner/evidence as nonempty but never claim the code authenticated a human. Approval creation is deliberately absent from an unattended CLI.
 - [ ] Add missing alias, cross-mode type mismatch, invalid alpha, unsupported color space, typography composite alias, and key-order tests. Run C1–C4 suite and commit with `feat(core): audit exact tokens and validate approvals`.
 
-## C5 — Pixel metric with explicit alpha and mask semantics
+## Task 5: C5 — Pixel metric with explicit alpha and mask semantics
 
 **Files:** create core `images.py`, `pixels.py`; create `tests/scripts/test_pixels.py`, `test_images.py`; create `docs/adr/004-visual-metric.md`.
 
@@ -347,7 +347,7 @@ def visible_delta(a: Image.Image, b: Image.Image) -> Image.Image:
 Threshold with `delta > channelTolerance`; combine masks in L mode so overlapping exclusions count once. Ratios use only eligible pixels. Validate all regions are in bounds, positive-area, have reasons/IDs, and do not hide critical regions. Reject different image sizes. Compute each critical region's own ratio; status passes only if every gate passes. At exactly 2% the global gate passes. Diff is a visible heatmap; overlay blends the actual with red at changed pixels.
 - [ ] Add exactly-at/above threshold, alpha-only changes, channel threshold boundary, overlapping masks, wrong PNG/profile, size mismatch, and critical-mask-overlap tests. Run C1–C5 suite and commit with `feat(core): compare visual output with explicit policy`.
 
-## C6 — Capture validation, reports and bounded correction state
+## Task 6: C6 — Capture validation, reports and bounded correction state
 
 **Files:** create core `captures.py`, `reports.py`, `iterations.py`; create `tests/scripts/test_captures.py`, `test_reports.py`, `test_iterations.py`; create `docs/adr/005-bounded-corrections.md`.
 
@@ -396,7 +396,7 @@ def next_correction(completed: int) -> int:
 - [ ] Persist correction counts keyed by node + reference hash + policy hash. Resume retains count; repeat execution must not reset it. Changing policy/reference starts a different run requiring new approval, not an automatic retry escape. Visual/golden approval uses `content_hash(evidence_payload(...))`; metaHash covers both reference and actual metadata.
 - [ ] Add tests modifying the complete C2 fixture's font hash, locale, crop, image dimensions, policy, and reference bytes; require blocked rather than failed/pass. Verify generated report hashes and output containment, and test resume at four corrections. Run suite and commit with `feat(core): record reproducible visual evidence`.
 
-## C7 — CLI and skills that orchestrate real capabilities
+## Task 7: C7 — CLI and skills that orchestrate real capabilities
 
 **Files:** create core `cli.py`, `cli_bundle.py`, `cli_compare.py`, `dispatch.py`, `scripts/core.py`; create `skills/figma-extract/SKILL.md`, `skills/figma-build/SKILL.md`, `skills/token-audit/SKILL.md`, `skills/visual-verify/SKILL.md`; create `skills/figma-extract/references/extraction.md`; create `tests/scripts/test_cli.py`, `test_dispatch.py`.
 
@@ -464,7 +464,7 @@ The build skill calls extraction/audit then selects an installed adapter. The ve
 
 - [ ] Add tests for malformed input, complete fixture validation, unknown command, nonzero compare exits, explicit target selection, and missing adapter. Record a transcript-based evaluation with a deliberately sparse context response; require a request for missing details and zero code edits. Run tests and commit with `feat(core): expose extraction and verification workflows`.
 
-## C8 — Installable package, evidence and handoff
+## Task 8: C8 — Installable package, evidence and handoff
 
 **Files:** create `.claude-plugin/marketplace.json`, `plugins/figma-core/.claude-plugin/plugin.json`, `tests/scripts/test_packaging.py`, `tests/evals/core-cases.json`, `tests/evals/README.md`, `docs/verification/core-results.md`, `docs/installation.md`, `docs/adr/006-upstream-isolation.md`; update `README.md` progress.
 
@@ -551,3 +551,4 @@ Context7 `/anthropics/claude-code` was queried for plugin structure; the install
 | 13–14 clarifications/evidence | Contract decisions and provenance above | Dependency/license verification per adapter |
 
 Recommended execution method: subagent-driven, one task at a time with independent review, because storage, approval, and comparison contracts are shared by both platforms. The written plan must be reviewed before implementation. Selecting this method does not authorize global installation or publication.
+
