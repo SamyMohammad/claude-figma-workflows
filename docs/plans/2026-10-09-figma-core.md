@@ -10,7 +10,7 @@
 
 **Spec:** `docs/specs/2026-10-09-figma-workflows-design.md`, approved by the owner on 2026-10-09.
 
-**Status:** Approved by the owner on 2026-10-09. C1–C8 implementation and task reviews completed; whole-branch review in progress. The checklists below preserve the approved plan. Actual execution, corrections, and unavailable checks are recorded in [core progress](../verification/core-progress.md) and [verification results](../verification/core-results.md).
+**Status:** Approved by the owner on 2026-10-09. C1–C8 implementation, task reviews, and whole-branch review completed for the core-only milestone. Local integration awaits the owner's choice. The checklists below preserve the approved plan. Actual execution, corrections, and unavailable checks are recorded in [core progress](../verification/core-progress.md) and [verification results](../verification/core-results.md).
 
 ## Global constraints
 

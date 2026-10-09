@@ -2,6 +2,8 @@
 
 | Check | Status | Evidence |
 | --- | --- | --- |
+| Final controller verification | passed | After the integration fixes: `.venv/Scripts/python.exe -m pytest tests/scripts -q -rs --basetemp .../pytest-controller-final` → 148 passed, 1 skipped in 38.61s. Skip: host denied Windows junction creation. Both strict Claude validations, `pip check`, and whitespace check also passed on this source state. |
+| Whole-branch review | passed | Four Important findings in [initial review](final-review.md) fixed with reproducing tests; [scoped re-review](final-rereview.md) approved the core-only milestone with no residual Critical/Important issues. See [fix evidence](task-reports/final-fix-report.md). |
 | Packaging TDD | passed | `test_packaging.py` initially failed for missing manifests and plugin lock; after packaging, 3 passed. Initial temp-path setup also failed under sandbox Temp, so final runs use a workspace `--basetemp`. |
 | Windows clean lock install | passed | Bundled Python 3.12.14; exact `requirements-core.lock` installed in an isolated venv. First sandbox network attempt failed DNS; escalated install succeeded. |
 | Windows Python suite | passed | Final integration fixes: `.venv/Scripts/python.exe -m pytest tests/scripts -q --basetemp .superpowers/sdd/2026-10-09-figma-core/pytest-final-fix-full -rs` → 148 passed, 1 skipped in 32.44s. The skip is `test_storage.py:122: host cannot create junction: Access is denied.` |
