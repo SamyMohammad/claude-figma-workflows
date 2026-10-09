@@ -171,6 +171,36 @@ def test_unapproved_dark_capture_blocks(bundle, tmp_path):
     assert report["status"] == "blocked" and report["code"] == "APPROVAL_INVALID"
 
 
+def test_text_capture_uses_subset_of_bundle_fonts(bundle, tmp_path):
+    fonts_dir = bundle / "fonts"
+    fonts_dir.mkdir()
+    entries = []
+    for name in ("a.ttf", "b.ttf"):
+        path = fonts_dir / name
+        path.write_bytes(f"synthetic-{name}".encode())
+        entries.append({"family": name, "weight": 400, "path": f"fonts/{name}",
+                        "sha256": file_hash(path), "status": "available", "license": "approved"})
+    fonts_path = bundle / "fonts.json"
+    _write(fonts_path, {"schemaVersion": 1, "fonts": entries})
+    meta_path = bundle / "components/button/default/meta.json"
+    meta = read_json(meta_path)
+    meta["containsText"] = True
+    meta["fontHashes"] = {entries[0]["path"]: entries[0]["sha256"]}
+    _write(meta_path, meta)
+    manifest = read_json(bundle / "manifest.json")
+    for path in (fonts_path, meta_path, *fonts_dir.iterdir()):
+        manifest["files"][path.relative_to(bundle).as_posix()] = file_hash(path)
+    _write(bundle / "manifest.json", manifest)
+    report = _run(bundle, tmp_path / "font-subset")
+    assert report["status"] == "passed"
+    meta["fontHashes"] = {"fonts/unknown.ttf": "a" * 64}
+    _write(meta_path, meta)
+    manifest["files"]["components/button/default/meta.json"] = file_hash(meta_path)
+    _write(bundle / "manifest.json", manifest)
+    report = _run(bundle, tmp_path / "unknown-font")
+    assert report["status"] == "blocked" and report["code"] == "FONT_UNAVAILABLE"
+
+
 @pytest.mark.parametrize("status,license", [("missing", "approved"), ("available", "restricted")])
 def test_unavailable_or_unlicensed_font_blocks(bundle, tmp_path, status, license):
     font_file = bundle / "fonts/test.ttf"
@@ -181,9 +211,15 @@ def test_unavailable_or_unlicensed_font_blocks(bundle, tmp_path, status, license
     fonts["fonts"] = [{"family": "Test", "weight": 400, "path": "fonts/test.ttf",
                        "sha256": digest, "status": status, "license": license}]
     _write(bundle / "fonts.json", fonts)
+    meta_path = bundle / "components/button/default/meta.json"
+    meta = read_json(meta_path)
+    meta["containsText"] = True
+    meta["fontHashes"] = {"fonts/test.ttf": digest}
+    _write(meta_path, meta)
     manifest = read_json(bundle / "manifest.json")
     manifest["files"]["fonts.json"] = file_hash(bundle / "fonts.json")
     manifest["files"]["fonts/test.ttf"] = digest
+    manifest["files"]["components/button/default/meta.json"] = file_hash(meta_path)
     _write(bundle / "manifest.json", manifest)
     report = _run(bundle, tmp_path / f"font-{status}-{license}")
     assert report["status"] == "blocked" and "changedRatio" not in report

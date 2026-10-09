@@ -68,16 +68,12 @@ def _bundle_inputs(bundle: Path, reference: Path, reference_meta: dict, policy: 
     fonts = read_json(safe_path(bundle, "fonts.json"))["fonts"]
     available = {font["path"]: font for font in fonts
                  if font["status"] == "available" and font["license"] == "approved"}
-    if reference_meta["containsText"] and (
-        not reference_meta["fontHashes"] or set(reference_meta["fontHashes"]) != set(available)
-    ):
-        raise CoreError("FONT_UNAVAILABLE", "Text capture lacks complete verified font evidence")
+    if reference_meta["containsText"] and not reference_meta["fontHashes"]:
+        raise CoreError("FONT_UNAVAILABLE", "Text capture lacks used-font evidence")
     for path, expected in reference_meta["fontHashes"].items():
         font = available.get(path)
         if font is None or font["sha256"] != expected or file_hash(safe_path(bundle, path)) != expected:
             raise CoreError("FONT_UNAVAILABLE", f"Font unavailable or changed: {path}")
-    if any(font["status"] != "available" or font["license"] != "approved" for font in fonts):
-        raise CoreError("FONT_UNAVAILABLE", "Bundle contains unavailable or unlicensed fonts")
     assets = read_json(safe_path(bundle, "assets/manifest.json"))["assets"]
     if any(asset["status"] != "available" for asset in assets):
         raise CoreError("ASSET_UNAVAILABLE", "Bundle contains unavailable assets")

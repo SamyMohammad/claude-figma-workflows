@@ -2,7 +2,7 @@
 
 ## Decision
 
-A comparison validates the complete recorded bundle, the exact node reference and metadata, capture conditions, available fonts and assets, token approval, and the approved comparison policy before measuring pixels. Recorded metadata explicitly states `containsText`; text captures require a complete verified font inventory, while empty font evidence is allowed only for a hash-verified no-text source. The capture theme must be among approved token modes. The run writes a new directory with capture images, diff, overlay, and machine and Markdown reports. A blocked run records its reason without a fabricated metric.
+A comparison validates the complete recorded bundle, the exact node reference and metadata, capture conditions, available fonts and assets, token approval, and the approved comparison policy before measuring pixels. Recorded metadata explicitly states `containsText`; text captures require nonempty used-font evidence, and each referenced font must be available, licensed, and hash verified. The bundle may contain fonts used by other nodes. Empty font evidence is allowed only for a hash-verified no-text source. The capture theme must be among approved token modes. The run writes a new directory with capture images, diff, overlay, and machine and Markdown reports. A blocked run records its reason without a fabricated metric.
 
 Automated pixel comparison and human visual review remain separate. An automated pass leaves `visualReview` as `not_run`. Geometry is `not_run` until measured bounds are explicitly checked. Platform and renderer labels are recorded, not required to match.
 
