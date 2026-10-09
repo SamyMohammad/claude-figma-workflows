@@ -1,0 +1,29 @@
+{
+  "components": [
+    {
+      "nodeId": "synthetic:component:button",
+      "path": "app/src/main/java/dev/figma/fixture/core/components/ActionButton.kt",
+      "platform": "compose",
+      "sourceHash": "f3a2b6b7cb57d8c9b2f11931af62e718e232f8deb93c03f77273ddd7269da9ea",
+      "symbol": "ActionButton",
+      "variant": "default"
+    },
+    {
+      "nodeId": "synthetic:component:card",
+      "path": "app/src/main/java/dev/figma/fixture/core/components/ContentCard.kt",
+      "platform": "compose",
+      "sourceHash": "f70a2a10daddbd30cc7fa007093c4f4705a73c6d9d7bcd20d0ed6c88cfa6a392",
+      "symbol": "ContentCard",
+      "variant": "default"
+    },
+    {
+      "nodeId": "synthetic:component:badge",
+      "path": "app/src/main/java/dev/figma/fixture/core/components/StatusBadge.kt",
+      "platform": "compose",
+      "sourceHash": "559a1801fb17851ecbbbe8dfe25ab67a173e1e3c0fbf616fc0ac91691b181e01",
+      "symbol": "StatusBadge",
+      "variant": "default"
+    }
+  ],
+  "schemaVersion": 1
+}

@@ -1,0 +1,107 @@
+{
+  "budget": {
+    "limit": 0,
+    "reserved": 0,
+    "spent": 0,
+    "windowId": "synthetic"
+  },
+  "capabilities": [],
+  "excludedNodes": [],
+  "extractedAt": "2026-10-09T00:00:00Z",
+  "fileKey": "synthetic-core-v1",
+  "files": {
+    ".gitattributes": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+    "README.md": "18fa43e9f1952225cad8912661ca7dbd2c563c37ea48577487e6f715aaba3729",
+    "Roboto-OFL.txt": "061402327a96aadb0bfb694a960ed289ecd38d383e396243831ab81feb109c41",
+    "assets/manifest.json": "d821b575707f49bf23b667d09cfc46a3edbdf82627aa5828183ab815bcce1b0d",
+    "comparison-policy.json": "bab617baf093902725f5d8462d337d0746932cc3e330fb8e11187e3795476f16",
+    "component-map.json": "60dd7a5db660382f94de21a68821445ed5a935566633e85ab423c2605b5c0938",
+    "components/badge/default/context.md": "5dcfa68e7fd0f862d7fc9bacdb27aa79dc460505b0518d70d5d58407c26767b7",
+    "components/badge/default/meta.json": "721d65da30426c5a17a29b7e8ac9feec2a18ce9430dcec1d56a351d16d9a001b",
+    "components/badge/default/reference.png": "4319728209f1bc4dd03ed6684e9b57fc60c3035525df035112cf9f5ac9f413d6",
+    "components/button/default/context.md": "16499ec636ce79d537f20290fe0ebeffe4c2c477da9f5baafbcd2612645bb11b",
+    "components/button/default/meta.json": "13f27a58c75ee57f69f2af4c9bd2c0bb3a9167fc8440a3701f788d79b019acff",
+    "components/button/default/reference.png": "9fc45560239f3fd1f2057ec40c626550e44418d966d403b780545047a3622fcd",
+    "components/card/default/context.md": "9f832db5270b3f034c26f0b0ff46f25743ccaeb58cb6cb71315ff9641dd567db",
+    "components/card/default/meta.json": "430d3239b4a167e62673ee87fa1990bdbbe72c66e8b07b62fb1aff958dfc1537",
+    "components/card/default/reference.png": "4b5b80a83f7a4aa9a9aad6d8f83f0c86754d5e0e31f0cd80d44c56c50801c52d",
+    "design/figma/compose/config.json": "3efce340654614025f3541d29589d8077e0473eb569589f4c01e84aa08543c74",
+    "fonts.json": "03b4eb5c40f531e9008f2758cfa4e5191be6d8e9058356c24d5eb8111ebf017c",
+    "roboto_regular.ttf": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
+    "screens/home/context.md": "8d5bb72ed448238cee081ded669ae21cf7af743bea0024c6df63280622d061d2",
+    "screens/home/meta.json": "097b8b1748860dc20f550996e6df58b280af69e508b9fcff74ddd86f45fcb7ed",
+    "screens/home/reference.png": "950125f7592ce5e7d8c6c5b3d3ae110d5d85a9d56ee2bb790dcbbfb7ab1c1af8",
+    "screens/review/context.md": "7426d733b9cc26523ec2f3c6e846f1e3b222418bbb31d4feeac8ed28cedd0d2d",
+    "screens/review/meta.json": "5f2a27339c15b6471246a1f8c8410f7a84fa5e06bbf0614dc13a679b234b68df",
+    "screens/review/reference.png": "1f18171bd6cafb97bbf5f51e0872a383d5100f95731654070ad180f72deaa32a",
+    "tokens-approval.json": "0edb418d0d664fd0b853feef1500d2d50f9509f7ad4e219831e2e1f64847d7c9",
+    "tokens.json": "111dff0dbe4c3f21111c33446b6b57efa360a832b134b5ad535ee3ec3c8c70d4"
+  },
+  "freshness": "unverified",
+  "nodes": [
+    {
+      "errorCode": null,
+      "id": "synthetic:screen:home",
+      "kind": "screen",
+      "path": "screens/home",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": null
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:screen:review",
+      "kind": "screen",
+      "path": "screens/review",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": null
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:component:button",
+      "kind": "component",
+      "path": "components/button/default",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": "default"
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:component:card",
+      "kind": "component",
+      "path": "components/card/default",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": "default"
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:component:badge",
+      "kind": "component",
+      "path": "components/badge/default",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": "default"
+    }
+  ],
+  "resume": {
+    "nextNode": null,
+    "reason": null
+  },
+  "schemaVersion": 1,
+  "scope": [
+    "synthetic:screen:home",
+    "synthetic:screen:review",
+    "synthetic:component:button",
+    "synthetic:component:card",
+    "synthetic:component:badge"
+  ],
+  "sourceRevision": "synthetic-v1",
+  "status": "complete",
+  "synthetic": true,
+  "tokenModes": [
+    "light",
+    "dark"
+  ]
+}
