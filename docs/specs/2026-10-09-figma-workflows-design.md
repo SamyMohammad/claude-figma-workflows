@@ -1,7 +1,7 @@
 # Figma-to-app workflows — design specification
 
 Date: 2026-10-09
-Status: Written specification awaiting owner review. Conversational design approved.
+Status: Written specification approved by the owner on 2026-10-09. Implementation plan is the next review stage.
 Source: Claude chat “تطبيق Pexels من تصميم Figma”, continued in Codex.
 
 ## 1. Intent and scope
@@ -186,7 +186,7 @@ Delivery order: approved written spec → reviewed core implementation plan → 
 
 These preserve the approved goal while removing unsafe assumptions from conversational examples: no unconditional rate-limit number; no silent token rounding; no unsupported command/API guarantees; no inference of per-node changes from file version alone; no universal source/plugin availability; no unverified dependency versions; no direct equivalence between pixel percentage and logical geometry; no claim that hooks are a complete security boundary.
 
-The owner reviews these clarifications with this specification before an implementation plan is written.
+The owner approved these clarifications with this specification on 2026-10-09.
 
 ## 14. Reference checks
 
