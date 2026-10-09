@@ -8,9 +8,10 @@ from pathlib import Path
 from .errors import CoreError
 
 
-def evidence_payload(reference_hash: str, actual_hash: str, meta_hash: str, policy_hash: str) -> dict:
+def evidence_payload(reference_hash: str, actual_hash: str, meta_hash: str,
+                     policy_hash: str, token_hash: str) -> dict:
     return {"referenceHash": reference_hash, "actualHash": actual_hash,
-            "metaHash": meta_hash, "policyHash": policy_hash}
+            "metaHash": meta_hash, "policyHash": policy_hash, "tokenHash": token_hash}
 
 
 def _escape(value: object) -> str:
@@ -30,6 +31,9 @@ def write_report(run: Path, report: dict, reference=None, actual=None, diff=None
     (run / "report.json").write_text(json.dumps(report, sort_keys=True, indent=2,
                                                ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
     lines = ["# Visual comparison", "", f"Status: {_escape(report['status'])}"]
+    if "freshness" in report:
+        lines.extend([f"Freshness: {_escape(report['freshness'])}",
+                      _escape(report["freshnessReason"])])
     if report.get("code"):
         lines.append(f"Code: {_escape(report['code'])}")
     if report.get("reason"):

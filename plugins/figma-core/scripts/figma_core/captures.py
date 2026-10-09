@@ -34,7 +34,7 @@ def require_matching_capture(reference_meta: dict, actual_meta: dict) -> None:
 
 
 def _bundle_inputs(bundle: Path, reference: Path, reference_meta: dict, policy: dict,
-                   policy_approval: dict) -> dict:
+                   policy_approval: dict) -> str:
     manifest = validate_bundle(bundle)
     if manifest["status"] != "complete":
         raise CoreError("BUNDLE_INCOMPLETE", "Bundle is not complete")
@@ -77,7 +77,7 @@ def _bundle_inputs(bundle: Path, reference: Path, reference_meta: dict, policy: 
     assets = read_json(safe_path(bundle, "assets/manifest.json"))["assets"]
     if any(asset["status"] != "available" for asset in assets):
         raise CoreError("ASSET_UNAVAILABLE", "Bundle contains unavailable assets")
-    return manifest
+    return content_hash(tokens)
 
 
 def compare_capture(bundle: Path, reference: Path, actual: Path, reference_meta: dict,
@@ -88,18 +88,21 @@ def compare_capture(bundle: Path, reference: Path, actual: Path, reference_meta:
     if any(run == path or run.is_relative_to(path) or path.is_relative_to(run) for path in paths):
         raise CoreError("REPORT_PATH", "Output overlaps input or bundle")
     report = {"schemaVersion": 1, "status": "blocked", "automatedComparison": "blocked",
-              "visualReview": "not_run", "geometry": "not_run", "elapsedCheck": "not_run"}
+              "visualReview": "not_run", "geometry": "not_run", "elapsedCheck": "not_run",
+              "freshness": "unverified",
+              "freshnessReason": "Offline comparison; source freshness is unverified"}
     images = None
     try:
-        _bundle_inputs(bundle, reference, reference_meta, policy, policy_approval)
         require_matching_capture(reference_meta, actual_meta)
+        token_hash = _bundle_inputs(bundle, reference, reference_meta, policy, policy_approval)
         images = (load_png(reference, reference_meta["colorSpace"]),
                   load_png(actual, actual_meta["colorSpace"]))
         if images[0].size != tuple(reference_meta["pixelSize"]) or images[1].size != tuple(actual_meta["pixelSize"]):
             raise CoreError("IMAGE_INVALID", "PNG dimensions differ from capture metadata")
         result = measure(*images, policy)
         meta_hash = content_hash({"reference": reference_meta, "actual": actual_meta})
-        evidence = evidence_payload(file_hash(reference), file_hash(actual), meta_hash, content_hash(policy))
+        evidence = evidence_payload(file_hash(reference), file_hash(actual), meta_hash,
+                                    content_hash(policy), token_hash)
         report.update({"status": result["status"], "automatedComparison": result["status"],
                        "changedPixels": result["changedPixels"], "eligiblePixels": result["eligiblePixels"],
                        "changedRatio": result["changedRatio"], "criticalResults": result["criticalResults"],

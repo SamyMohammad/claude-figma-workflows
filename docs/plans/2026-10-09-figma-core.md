@@ -10,7 +10,7 @@
 
 **Spec:** `docs/specs/2026-10-09-figma-workflows-design.md`, approved by the owner on 2026-10-09.
 
-**Status:** Approved by the owner on 2026-10-09. Execution in progress using subagent-driven development.
+**Status:** Approved by the owner on 2026-10-09. C1–C8 implementation and task reviews completed; whole-branch review in progress. The checklists below preserve the approved plan. Actual execution, corrections, and unavailable checks are recorded in [core progress](../verification/core-progress.md) and [verification results](../verification/core-results.md).
 
 ## Global constraints
 
@@ -351,7 +351,7 @@ Threshold with `delta > channelTolerance`; combine masks in L mode so overlappin
 
 **Files:** create core `captures.py`, `reports.py`, `iterations.py`; create `tests/scripts/test_captures.py`, `test_reports.py`, `test_iterations.py`; create `docs/adr/005-bounded-corrections.md`.
 
-**Interfaces:** `require_matching_capture(reference_meta: dict, actual_meta: dict) -> None`; `compare_capture(bundle: Path, reference: Path, actual: Path, reference_meta: dict, actual_meta: dict, policy: dict, policy_approval: dict, output: Path) -> dict`; `next_correction(completed: int) -> int`; `evidence_payload(reference_hash: str, actual_hash: str, meta_hash: str, policy_hash: str) -> dict`.
+**Interfaces:** `require_matching_capture(reference_meta: dict, actual_meta: dict) -> None`; `compare_capture(bundle: Path, reference: Path, actual: Path, reference_meta: dict, actual_meta: dict, policy: dict, policy_approval: dict, output: Path) -> dict`; `next_correction(completed: int) -> int`; `evidence_payload(reference_hash: str, actual_hash: str, meta_hash: str, policy_hash: str, token_hash: str) -> dict`.
 
 - [ ] Tests first:
 
@@ -371,8 +371,8 @@ def test_fifth_correction_is_blocked():
         next_correction(4)
 
 def test_reference_replacement_invalidates_evidence():
-    a = evidence_payload("a" * 64, "b" * 64, "c" * 64, "d" * 64)
-    b = evidence_payload("e" * 64, "b" * 64, "c" * 64, "d" * 64)
+    a = evidence_payload("a" * 64, "b" * 64, "c" * 64, "d" * 64, "f" * 64)
+    b = evidence_payload("e" * 64, "b" * 64, "c" * 64, "d" * 64, "f" * 64)
     assert content_hash(a) != content_hash(b)
 ```
 
@@ -380,9 +380,9 @@ def test_reference_replacement_invalidates_evidence():
 - [ ] Require approval of the exact policy before running `measure`. Reports preserve separate outcomes for automated comparison and human review; a metric pass sets `visualReview: not_run` until approved. Geometry is `not_run` unless supplied measured bounds are checked explicitly; do not report full visual acceptance from pixels alone.
 
 ```python
-def evidence_payload(reference_hash, actual_hash, meta_hash, policy_hash):
+def evidence_payload(reference_hash, actual_hash, meta_hash, policy_hash, token_hash):
     return {"referenceHash": reference_hash, "actualHash": actual_hash,
-            "metaHash": meta_hash, "policyHash": policy_hash}
+            "metaHash": meta_hash, "policyHash": policy_hash, "tokenHash": token_hash}
 
 def next_correction(completed: int) -> int:
     if isinstance(completed, bool) or not isinstance(completed, int) or completed < 0:
@@ -393,7 +393,7 @@ def next_correction(completed: int) -> int:
 ```
 
 - [ ] Write artifacts into a new run directory: `reference.png`, `actual.png`, `diff.png`, `overlay.png`, `report.json`, `report.md`. Refuse source/output overlap or existing run directories. Machine report contains schema version, metric counts, policy/hash, input image/meta hashes, critical region results, elapsed check status, human/geometry status, and renderer labels. Escape untrusted Markdown fields. A blocked run produces a small report with reason/code and no fabricated metric; CLI returns 2.
-- [ ] Persist correction counts keyed by node + reference hash + policy hash. Resume retains count; repeat execution must not reset it. Changing policy/reference starts a different run requiring new approval, not an automatic retry escape. Visual/golden approval uses `content_hash(evidence_payload(...))`; metaHash covers both reference and actual metadata.
+- [ ] Persist correction counts keyed by node + reference hash + policy hash. Resume retains count; repeat execution must not reset it. Changing policy/reference starts a different run requiring new approval, not an automatic retry escape. Visual/golden approval uses `content_hash(evidence_payload(...))`; metaHash covers both reference and actual metadata. The required fifth argument tokenHash is content_hash of the approved tokens document; approving changed tokens invalidates prior visual/golden evidence.
 - [ ] Add tests modifying the complete C2 fixture's font hash, locale, crop, image dimensions, policy, and reference bytes; require blocked rather than failed/pass. Verify generated report hashes and output containment, and test resume at four corrections. Run suite and commit with `feat(core): record reproducible visual evidence`.
 
 ## Task 7: C7 — CLI and skills that orchestrate real capabilities

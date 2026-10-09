@@ -79,10 +79,11 @@ def _check_comparison_policy(policy: dict) -> None:
             raise CoreError("BUNDLE_INVALID", "Critical and ignored regions overlap")
 
 
-def validate_bundle(root: Path) -> dict:
+def validate_bundle(root: Path, *, manifest_override: dict | None = None) -> dict:
     """Validate bundle structure, references, and recorded file hashes."""
     root = root.resolve()
-    manifest = read_json(_inside(root, "manifest.json"))
+    manifest = (read_json(_inside(root, "manifest.json"))
+                if manifest_override is None else manifest_override)
     validate_document("manifest", manifest)
     files = manifest["files"]
     check_collisions(list(files))

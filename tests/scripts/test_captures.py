@@ -223,3 +223,42 @@ def test_unavailable_or_unlicensed_font_blocks(bundle, tmp_path, status, license
     _write(bundle / "manifest.json", manifest)
     report = _run(bundle, tmp_path / f"font-{status}-{license}")
     assert report["status"] == "blocked" and "changedRatio" not in report
+
+
+@pytest.mark.parametrize("freshness", ["unverified", "verified"])
+def test_offline_report_discloses_unverified_freshness(bundle, tmp_path, freshness):
+    manifest = read_json(bundle / "manifest.json")
+    manifest["freshness"] = freshness
+    _write(bundle / "manifest.json", manifest)
+    output = tmp_path / "offline"
+    report = _run(bundle, output)
+    assert report["status"] == "passed"
+    assert report["freshness"] == "unverified"
+    assert report["freshnessReason"] == "Offline comparison; source freshness is unverified"
+    assert read_json(output / "report.json")["freshness"] == "unverified"
+    assert "Offline comparison; source freshness is unverified" in (output / "report.md").read_text()
+
+
+def test_fresh_token_approval_invalidates_visual_and_golden_evidence(bundle, tmp_path):
+    from figma_core.approvals import require_approval
+
+    before = _run(bundle, tmp_path / "before")
+    tokens = read_json(bundle / "tokens.json")
+    tokens["base"]["space"]["small"]["$value"]["value"] = 9
+    _write(bundle / "tokens.json", tokens)
+    approval = read_json(bundle / "tokens-approval.json")
+    approval["contentHash"] = content_hash(tokens)
+    _write(bundle / "tokens-approval.json", approval)
+    manifest = read_json(bundle / "manifest.json")
+    for name in ("tokens.json", "tokens-approval.json"):
+        manifest["files"][name] = file_hash(bundle / name)
+    _write(bundle / "manifest.json", manifest)
+    after = _run(bundle, tmp_path / "after")
+    assert before["status"] == after["status"] == "passed"
+    assert before["evidenceHash"] != after["evidenceHash"]
+    assert after["tokenHash"] == content_hash(tokens)
+    for kind in ("visual", "goldens"):
+        old_approval = {**approval, "kind": kind, "modes": [], "contentHash": before["evidenceHash"]}
+        evidence = {key: after[key] for key in ("referenceHash", "actualHash", "metaHash", "policyHash", "tokenHash")}
+        with pytest.raises(CoreError, match="hash mismatch"):
+            require_approval(evidence, old_approval, kind)

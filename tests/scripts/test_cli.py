@@ -123,3 +123,24 @@ def test_compare_exit_codes_and_human_review(tmp_path, capsys):
     assert read_json(tmp_path / "pass/report.json")["visualReview"] == "not_run"
     Image.new("RGBA", (20, 20), "red").save(actual)
     assert main([*command, "--output", str(tmp_path / "fail")]) == 1
+
+
+def test_missing_capture_metadata_writes_blocked_report_and_exits_two(tmp_path, capsys):
+    bundle = _approved_bundle(tmp_path)
+    node = bundle / "components/button/default"
+    malformed = tmp_path / "malformed.json"
+    malformed.write_text("{}", encoding="utf-8")
+    for field in ("reference", "actual"):
+        output = tmp_path / field
+        assert main(["compare", "--bundle", str(bundle), "--reference", str(node / "reference.png"),
+                     "--actual", str(node / "reference.png"),
+                     "--reference-meta", str(malformed if field == "reference" else node / "meta.json"),
+                     "--actual-meta", str(malformed if field == "actual" else node / "meta.json"),
+                     "--policy", str(bundle / "comparison-policy.json"),
+                     "--policy-approval", str(bundle / "policy-approval.json"),
+                     "--output", str(output)]) == 2
+        report = read_json(output / "report.json")
+        assert report["status"] == "blocked" and report["code"] == "SCHEMA_INVALID"
+        assert report["reason"].startswith("Invalid value at ")
+        assert "changedRatio" not in report
+        assert "SCHEMA" in (output / "report.md").read_text()

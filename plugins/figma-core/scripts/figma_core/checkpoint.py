@@ -1,11 +1,12 @@
 """Coordinator-owned extraction checkpoints."""
 
+from copy import deepcopy
 from pathlib import Path
 
 from .documents import read_json
 from .errors import CoreError
 from .paths import safe_path
-from .schema import _REQUIRED, _check_meta, validate_document
+from .schema import _REQUIRED, _check_meta, validate_bundle, validate_document
 from .storage import atomic_json, file_hash
 
 
@@ -83,16 +84,18 @@ def complete_node(root: Path, node_id: str) -> dict:
                 raise CoreError("HASH_MISMATCH", f"Recorded file hash mismatch: {name}")
         _verify_completed_nodes(root, manifest, node_id)
         all_assets = _verify_assets(root, manifest)
+        candidate = deepcopy(manifest)
+        candidate["files"].update(hashes)
+        candidate_node = next(item for item in candidate["nodes"] if item["id"] == node_id)
+        candidate_node.update({"status": "complete", "errorCode": None})
+        candidate["status"] = ("complete" if all_assets and all(
+            item["status"] == "complete" for item in candidate["nodes"]) else "partial")
+        validate_bundle(root, manifest_override=candidate)
     except CoreError as error:
         node["status"] = "pending"
         node["errorCode"] = error.code
         manifest["status"] = "partial"
         atomic_json(root, "manifest.json", manifest)
         return manifest
-    manifest["files"].update(hashes)
-    node["status"] = "complete"
-    node["errorCode"] = None
-    manifest["status"] = ("complete" if all_assets and all(
-        item["status"] == "complete" for item in manifest["nodes"]) else "partial")
-    atomic_json(root, "manifest.json", manifest)
-    return manifest
+    atomic_json(root, "manifest.json", candidate)
+    return candidate

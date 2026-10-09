@@ -82,3 +82,21 @@ def test_other_complete_node_missing_file_ref_blocks_final_completion(tmp_path):
     assert result["status"] == "partial"
     assert result["nodes"][0]["status"] == "pending"
     assert result["nodes"][0]["errorCode"] is not None
+
+
+def test_invalid_shared_document_cannot_complete_checkpoint(tmp_path):
+    from figma_core.storage import file_hash
+
+    root = make_fixture(tmp_path / "bundle")
+    manifest = read_json(root / "manifest.json")
+    node = manifest["nodes"][0]
+    node["status"] = "pending"
+    manifest["status"] = "partial"
+    (root / "fonts.json").write_text("{}", encoding="utf-8")
+    manifest["files"]["fonts.json"] = file_hash(root / "fonts.json")
+    (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    result = complete_node(root, node["id"])
+    assert result["status"] == "partial"
+    assert result["nodes"][0]["status"] == "pending"
+    assert result["nodes"][0]["errorCode"] == "SCHEMA_INVALID"
+    assert read_json(root / "manifest.json") == result
