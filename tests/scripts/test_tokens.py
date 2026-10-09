@@ -37,21 +37,22 @@ def test_cross_mode_type_mismatch_blocks_audit():
     assert result["issues"] == ["Semantic path/type mismatch: x"]
 
 
-def test_huge_json_integer_is_typed_error_and_blocks_audit():
-    tokens = json.loads(json.dumps({"light": {"x": {"$type": "number", "$value": 10**400}}}))
-    with pytest.raises(CoreError, match="number"):
-        resolve_tokens(tokens, "light")
+def test_huge_json_integer_preserves_precision_and_audits():
+    value = 10**400 + 123
+    tokens = json.loads(json.dumps({"light": {"x": {"$type": "number", "$value": value}}}))
+    assert resolve_tokens(tokens, "light")["x"]["value"] == value
     result = audit_tokens(tokens)
-    assert result["status"] == "blocked"
-    assert "number" in result["issues"][0]
+    assert result["status"] == "passed"
 
 
-def test_integer_must_fit_json_safe_precision():
-    tokens = {"light": {"x": {"$type": "number", "$value": 2**53}}}
-    with pytest.raises(CoreError, match="number"):
-        resolve_tokens(tokens, "light")
-    tokens["light"]["x"]["$value"] = 2**53 - 1
-    assert resolve_tokens(tokens, "light")["x"]["value"] == 2**53 - 1
+def test_near_value_comparison_handles_large_numbers():
+    value = 10**400
+    tokens = {"light": {"x": {"$type": "number", "$value": value},
+                        "y": {"$type": "number", "$value": value + 1}}}
+    result = audit_tokens(tokens)
+    assert result["status"] == "passed"
+    assert result["proposals"] == [{"kind": "near-value", "mode": "light",
+                                    "paths": ["x", "y"], "values": [value, value + 1]}]
 
 
 @pytest.mark.parametrize("value", [

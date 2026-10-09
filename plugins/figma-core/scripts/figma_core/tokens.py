@@ -3,6 +3,7 @@
 import json
 import re
 from copy import deepcopy
+from fractions import Fraction
 
 from .errors import CoreError
 from .token_types import SUPPORTED, TYPOGRAPHY_FIELDS, validate_value
@@ -134,7 +135,9 @@ def audit_tokens(document: dict) -> dict:
                        if token["type"] == "number"]
             for index, (first_path, first) in enumerate(numbers):
                 for second_path, second in numbers[index + 1:]:
-                    if first != second and abs(first - second) <= max(abs(first), abs(second)) * 0.05:
+                    first_exact, second_exact = Fraction(first), Fraction(second)
+                    if (first != second and abs(first_exact - second_exact) * 20
+                            <= max(abs(first_exact), abs(second_exact))):
                         proposals.append({"kind": "near-value", "mode": mode,
                                           "paths": [first_path, second_path], "values": [first, second]})
     return {"status": "blocked" if issues else "passed", "issues": issues, "proposals": proposals}

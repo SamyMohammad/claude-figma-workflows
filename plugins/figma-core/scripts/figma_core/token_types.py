@@ -14,12 +14,9 @@ _FONT_WEIGHTS = frozenset({"thin", "hairline", "extra-light", "ultra-light", "li
 TYPOGRAPHY_FIELDS = {"fontFamily": "fontFamily", "fontSize": "dimension",
                      "fontWeight": "fontWeight", "letterSpacing": "dimension",
                      "lineHeight": "number"}
-_MAX_SAFE_INTEGER = 2**53 - 1
-
-
 def _number(value: object) -> bool:
     if type(value) is int:
-        return -_MAX_SAFE_INTEGER <= value <= _MAX_SAFE_INTEGER
+        return True
     return type(value) is float and math.isfinite(value)
 
 
