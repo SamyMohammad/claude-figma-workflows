@@ -1,17 +1,18 @@
 import json
 import os
 import subprocess
+from hashlib import sha256
 
 import pytest
 
 from figma_core.errors import CoreError
-from figma_core.paths import safe_path
+from figma_core.paths import check_collisions, safe_path
 from figma_core.storage import atomic_json
 from fixtures.make_core_fixture import make_fixture
 from figma_core.schema import validate_bundle
 
 
-@pytest.mark.parametrize("path", ["../escape", "C:/escape", "/escape", "a\\..\\escape", "a:stream", "a/./b", "CON", "name. "])
+@pytest.mark.parametrize("path", ["../escape", "C:/escape", "/escape", "a\\..\\escape", "a:stream", "a/./b", "CON", "name. ", "a?b", "a*b", "a<b", "a>b", "a|b"])
 def test_external_paths_are_rejected(tmp_path, path):
     with pytest.raises(CoreError):
         safe_path(tmp_path, path)
@@ -48,6 +49,16 @@ def test_case_folded_paths_are_rejected(tmp_path):
         validate_bundle(root)
 
 
+def test_case_folded_file_directory_collision_is_rejected():
+    with pytest.raises(CoreError, match="collision"):
+        check_collisions(["A", "a/x"])
+
+
+def test_case_folded_directory_alias_is_rejected():
+    with pytest.raises(CoreError, match="collision"):
+        check_collisions(["A/x", "a/y"])
+
+
 def test_symlink_escape_is_rejected_when_supported(tmp_path):
     root = tmp_path / "bundle"
     root.mkdir()
@@ -69,6 +80,33 @@ def test_complete_bundle_rejects_missing_asset(tmp_path):
                          "mimeType": "image/png", "sha256": "a" * 64, "status": "missing"}]
     asset_path.write_text(json.dumps(assets), encoding="utf-8")
     with pytest.raises(CoreError, match="missing assets"):
+        validate_bundle(root)
+
+
+@pytest.mark.parametrize("kind", ["asset", "font"])
+def test_available_entry_hash_must_match_bytes(tmp_path, kind):
+    root = make_fixture(tmp_path / "bundle")
+    relative = "assets/sample.png" if kind == "asset" else "fonts/sample.ttf"
+    item_path = root / relative
+    item_path.parent.mkdir(exist_ok=True)
+    item_path.write_bytes(b"actual content")
+    document_path = root / ("assets/manifest.json" if kind == "asset" else "fonts.json")
+    document = json.loads(document_path.read_text(encoding="utf-8"))
+    if kind == "asset":
+        document["assets"] = [{"nodeId": "synthetic:screen:home", "path": relative,
+                               "mimeType": "image/png", "sha256": "a" * 64,
+                               "status": "available"}]
+    else:
+        document["fonts"] = [{"family": "Synthetic", "weight": 400,
+                              "path": relative, "sha256": "a" * 64,
+                              "status": "available", "license": "approved"}]
+    document_path.write_text(json.dumps(document), encoding="utf-8")
+    manifest_path = root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for path in (item_path, document_path):
+        manifest["files"][path.relative_to(root).as_posix()] = sha256(path.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(CoreError, match="hash mismatch"):
         validate_bundle(root)
 
 

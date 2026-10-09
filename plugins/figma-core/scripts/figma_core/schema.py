@@ -129,6 +129,8 @@ def validate_bundle(root: Path) -> dict:
             path is None or font["sha256"] is None or path not in files
         ):
             raise CoreError("BUNDLE_INVALID", "Available font has no file reference")
+        if font["status"] == "available" and file_hash(_inside(root, path)) != font["sha256"]:
+            raise CoreError("BUNDLE_INVALID", f"Available font hash mismatch: {path}")
     asset_paths = [entry["path"] for entry in documents["assets"]["assets"]]
     if len(asset_paths) != len(set(asset_paths)):
         raise CoreError("BUNDLE_INVALID", "Duplicate asset paths")
@@ -138,6 +140,9 @@ def validate_bundle(root: Path) -> dict:
             raise CoreError("BUNDLE_INVALID", "Invalid asset node reference")
         if asset["status"] == "available" and asset["path"] not in files:
             raise CoreError("BUNDLE_INVALID", "Available asset has no file reference")
+        if (asset["status"] == "available"
+                and file_hash(_inside(root, asset["path"])) != asset["sha256"]):
+            raise CoreError("BUNDLE_INVALID", f"Available asset hash mismatch: {asset['path']}")
     for node in manifest["nodes"]:
         directory = node["path"]
         _inside(root, directory)
@@ -161,7 +166,7 @@ def validate_bundle(root: Path) -> dict:
         asset["status"] != "available" for asset in documents["assets"]["assets"]
     ):
         raise CoreError("BUNDLE_INVALID", "Complete bundle has missing assets")
-    check_collisions(list(files) + paths)
+    check_collisions(list(files) + paths, set(paths))
     for name, expected in files.items():
         if file_hash(_inside(root, name)) != expected:
             raise CoreError("BUNDLE_INVALID", f"Recorded file hash mismatch: {name}")

@@ -14,6 +14,7 @@ def safe_path(root: Path, relative: str) -> Path:
     parts = relative.split("/")
     if (posix.is_absolute() or windows.is_absolute() or windows.drive
             or any(part in ("", ".", "..") or part.endswith((".", " "))
+                   or any(char in '<>"|?*' or ord(char) < 32 for char in part)
                    or PureWindowsPath(part).is_reserved() for part in parts)):
         raise CoreError("PATH_INVALID", "Invalid relative bundle path")
     base = root.resolve()
@@ -28,10 +29,26 @@ def safe_path(root: Path, relative: str) -> Path:
     return candidate
 
 
-def check_collisions(paths: list[str]) -> None:
-    folded = set()
+def check_collisions(paths: list[str], directories: set[str] | None = None) -> None:
+    directories = directories or set()
+    prefixes = {}
+    full = {}
     for name in paths:
+        parts = name.split("/")
+        for index in range(1, len(parts) + 1):
+            prefix = "/".join(parts[:index])
+            key = prefix.casefold()
+            if key in prefixes and prefixes[key] != prefix:
+                raise CoreError("PATH_INVALID", "Case-folded bundle path collision")
+            prefixes[key] = prefix
         key = name.casefold()
-        if key in folded:
+        if key in full:
             raise CoreError("PATH_INVALID", "Case-folded bundle path collision")
-        folded.add(key)
+        full[key] = name
+    for name in paths:
+        parts = name.split("/")
+        for index in range(1, len(parts)):
+            parent = "/".join(parts[:index])
+            existing = full.get(parent.casefold())
+            if existing is not None and existing not in directories:
+                raise CoreError("PATH_INVALID", "File/directory bundle path collision")

@@ -66,3 +66,19 @@ def test_crashed_manifest_replace_keeps_previous_checkpoint(tmp_path, monkeypatc
     with pytest.raises(CoreError, match="replace failed"):
         complete_node(root, node["id"])
     assert read_json(manifest_path)["nodes"][0]["status"] == "pending"
+
+
+def test_other_complete_node_missing_file_ref_blocks_final_completion(tmp_path):
+    root = make_fixture(tmp_path / "bundle")
+    manifest_path = root / "manifest.json"
+    manifest = read_json(manifest_path)
+    pending = manifest["nodes"][0]
+    other = manifest["nodes"][1]
+    pending["status"] = "pending"
+    manifest["status"] = "partial"
+    manifest["files"].pop(f'{other["path"]}/reference.png')
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    result = complete_node(root, pending["id"])
+    assert result["status"] == "partial"
+    assert result["nodes"][0]["status"] == "pending"
+    assert result["nodes"][0]["errorCode"] is not None
