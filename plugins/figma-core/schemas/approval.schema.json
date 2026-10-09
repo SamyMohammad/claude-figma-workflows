@@ -9,7 +9,8 @@
         "tokens",
         "policy",
         "visual",
-        "goldens"
+        "goldens",
+        "reference"
       ]
     },
     "contentHash": {

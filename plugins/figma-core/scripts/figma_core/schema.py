@@ -146,6 +146,14 @@ def validate_bundle(root: Path) -> dict:
     for node in manifest["nodes"]:
         directory = node["path"]
         _inside(root, directory)
+        reference_approval = f"{directory}/reference-approval.json"
+        if _inside(root, reference_approval).exists():
+            if reference_approval not in files:
+                raise CoreError("BUNDLE_INVALID", "Missing source-target approval file reference")
+            approval = read_json(_inside(root, reference_approval))
+            validate_document("approval", approval)
+            if approval["kind"] != "reference":
+                raise CoreError("APPROVAL_INVALID", "Source-target approval kind differs")
         if node["status"] != "complete":
             continue
         for suffix in ("context.md", "reference.png", "meta.json"):
