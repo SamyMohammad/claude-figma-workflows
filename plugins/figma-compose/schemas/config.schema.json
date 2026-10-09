@@ -379,7 +379,10 @@
           "small",
           "medium",
           "large",
-          "extraLarge"
+          "extraLarge",
+          "colorScheme:unmapped",
+          "typography:unmapped",
+          "shapes:unmapped"
         ]
       }
     }
