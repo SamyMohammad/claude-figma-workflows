@@ -75,5 +75,5 @@ def main(argv: list[str]) -> int:
         return 2
     except (OSError, sqlite3.Error, ImportError) as error:
         code = "DEPENDENCY_MISSING" if isinstance(error, ImportError) else "IO_ERROR"
-        print(f"{code}: Local operation unavailable; install requirements.lock in the selected venv", file=sys.stderr)
+        print(f"{code}: Local operation unavailable; install requirements-core.lock from this plugin in the selected venv", file=sys.stderr)
         return 2

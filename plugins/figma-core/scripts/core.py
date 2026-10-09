@@ -5,7 +5,7 @@ import sys
 try:
     from figma_core.cli import main
 except ImportError:
-    print("DEPENDENCY_MISSING: Install requirements.lock in the selected Python venv", file=sys.stderr)
+    print("DEPENDENCY_MISSING: Install requirements-core.lock from this plugin in the selected Python venv", file=sys.stderr)
     raise SystemExit(2) from None
 
 if __name__ == "__main__":
