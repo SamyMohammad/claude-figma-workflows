@@ -10,7 +10,7 @@
 
 **Spec:** `docs/specs/2026-10-09-figma-workflows-design.md`, especially sections 2–5, 7–12. Implemented core contract: `docs/adr/005-bounded-corrections.md` and current core scripts/schemas.
 
-**Status:** Written plan awaiting owner review. Execution method remains subagent-driven, as previously selected. Compose is prioritized before Flutter at the owner's request on 2026-10-09. No Compose runtime implementation has started.
+**Status:** Owner authorized continuous implementation on 2026-10-10. Execution method is subagent-driven with independent task and final review. Compose is prioritized before Flutter; task evidence is recorded in the SDD ledger and release verification documents.
 
 ## Global constraints
 
@@ -425,4 +425,5 @@ This plan produces the Compose adapter before Flutter, as requested. It does not
 - Google Maven/Central `maven-metadata.xml` for the versions listed above, queried directly on 2026-10-09.
 - [Roboto OFL](https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/OFL.txt) and the locally inspected ECC 1.10.0 MIT license/source paths.
 
-The owner reviews this written plan before implementation; the previously selected subagent-driven method remains in effect.
+The owner authorized implementation on 2026-10-10; the previously selected subagent-driven method remains in effect.
+
