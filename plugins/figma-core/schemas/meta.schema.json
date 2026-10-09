@@ -64,6 +64,9 @@
         "pattern": "^[0-9a-f]{64}$"
       }
     },
+    "containsText": {
+      "type": "boolean"
+    },
     "platform": {
       "type": "string",
       "minLength": 1
@@ -127,6 +130,7 @@
     "direction",
     "theme",
     "fontHashes",
+    "containsText",
     "platform",
     "renderer",
     "textScale",

@@ -14,7 +14,7 @@ from .storage import file_hash
 
 
 _MATCHED = ("nodeId", "sourceRevision", "logicalSize", "pixelSize", "scale", "locale",
-            "direction", "theme", "fontHashes", "textScale", "crop", "insets",
+            "direction", "theme", "fontHashes", "containsText", "textScale", "crop", "insets",
             "animation", "colorSpace")
 
 
@@ -63,9 +63,15 @@ def _bundle_inputs(bundle: Path, reference: Path, reference_meta: dict, policy: 
     require_approval(tokens, token_approval, "tokens")
     if set(token_approval["modes"]) != modes:
         raise CoreError("APPROVAL_INVALID", "Token approval modes differ")
+    if reference_meta["theme"] not in set(token_approval["modes"]):
+        raise CoreError("APPROVAL_INVALID", "Capture theme is not an approved token mode")
     fonts = read_json(safe_path(bundle, "fonts.json"))["fonts"]
     available = {font["path"]: font for font in fonts
                  if font["status"] == "available" and font["license"] == "approved"}
+    if reference_meta["containsText"] and (
+        not reference_meta["fontHashes"] or set(reference_meta["fontHashes"]) != set(available)
+    ):
+        raise CoreError("FONT_UNAVAILABLE", "Text capture lacks complete verified font evidence")
     for path, expected in reference_meta["fontHashes"].items():
         font = available.get(path)
         if font is None or font["sha256"] != expected or file_hash(safe_path(bundle, path)) != expected:

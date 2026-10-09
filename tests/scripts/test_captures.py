@@ -136,6 +136,41 @@ def test_unapproved_policy_blocks(bundle, tmp_path):
     assert result["status"] == "blocked" and result["code"] == "APPROVAL_INVALID"
 
 
+def test_text_capture_without_font_evidence_blocks(bundle, tmp_path):
+    meta_path = bundle / "components/button/default/meta.json"
+    meta = read_json(meta_path)
+    meta["containsText"] = True
+    _write(meta_path, meta)
+    manifest = read_json(bundle / "manifest.json")
+    manifest["files"]["components/button/default/meta.json"] = file_hash(meta_path)
+    _write(bundle / "manifest.json", manifest)
+    report = _run(bundle, tmp_path / "text-without-font")
+    assert report["status"] == "blocked" and report["code"] == "FONT_UNAVAILABLE"
+
+
+def test_unapproved_dark_capture_blocks(bundle, tmp_path):
+    meta_path = bundle / "components/button/default/meta.json"
+    meta = read_json(meta_path)
+    meta["theme"] = "dark"
+    _write(meta_path, meta)
+    tokens_path = bundle / "tokens.json"
+    tokens = read_json(tokens_path)
+    del tokens["dark"]
+    _write(tokens_path, tokens)
+    token_approval_path = bundle / "tokens-approval.json"
+    approval = read_json(token_approval_path)
+    approval["modes"] = ["light"]
+    approval["contentHash"] = content_hash(tokens)
+    _write(token_approval_path, approval)
+    manifest = read_json(bundle / "manifest.json")
+    manifest["tokenModes"] = ["light"]
+    for path in (meta_path, tokens_path, token_approval_path):
+        manifest["files"][path.relative_to(bundle).as_posix()] = file_hash(path)
+    _write(bundle / "manifest.json", manifest)
+    report = _run(bundle, tmp_path / "unapproved-dark")
+    assert report["status"] == "blocked" and report["code"] == "APPROVAL_INVALID"
+
+
 @pytest.mark.parametrize("status,license", [("missing", "approved"), ("available", "restricted")])
 def test_unavailable_or_unlicensed_font_blocks(bundle, tmp_path, status, license):
     font_file = bundle / "fonts/test.ttf"

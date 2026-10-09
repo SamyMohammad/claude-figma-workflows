@@ -36,7 +36,8 @@ def make_fixture(root: Path) -> Path:
                 "schemaVersion": 1, "nodeId": node_id, "sourceRevision": "synthetic-v1",
                 "logicalSize": [size, size], "pixelSize": [size, size], "scale": 1,
                 "locale": "en-US", "direction": "ltr", "theme": "light",
-                "fontHashes": {}, "platform": "synthetic", "renderer": "pillow",
+                "fontHashes": {}, "containsText": False,
+                "platform": "synthetic", "renderer": "pillow",
                 "textScale": 1, "crop": [0, 0, size, size], "insets": [0, 0, 0, 0],
                 "animation": "settled", "colorSpace": "srgb",
             })
