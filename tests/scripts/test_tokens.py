@@ -1,4 +1,5 @@
 from copy import deepcopy
+import json
 
 import pytest
 
@@ -30,8 +31,27 @@ def test_missing_alias_is_rejected():
 
 def test_cross_mode_type_mismatch_blocks_audit():
     tokens = {"light": {"x": {"$type": "number", "$value": 1}},
-              "dark": {"x": {"$type": "dimension", "$value": "1px"}}}
-    assert audit_tokens(tokens)["status"] == "blocked"
+              "dark": {"x": {"$type": "dimension", "$value": {"value": 1, "unit": "px"}}}}
+    result = audit_tokens(tokens)
+    assert result["status"] == "blocked"
+    assert result["issues"] == ["Semantic path/type mismatch: x"]
+
+
+def test_huge_json_integer_is_typed_error_and_blocks_audit():
+    tokens = json.loads(json.dumps({"light": {"x": {"$type": "number", "$value": 10**400}}}))
+    with pytest.raises(CoreError, match="number"):
+        resolve_tokens(tokens, "light")
+    result = audit_tokens(tokens)
+    assert result["status"] == "blocked"
+    assert "number" in result["issues"][0]
+
+
+def test_integer_must_fit_json_safe_precision():
+    tokens = {"light": {"x": {"$type": "number", "$value": 2**53}}}
+    with pytest.raises(CoreError, match="number"):
+        resolve_tokens(tokens, "light")
+    tokens["light"]["x"]["$value"] = 2**53 - 1
+    assert resolve_tokens(tokens, "light")["x"]["value"] == 2**53 - 1
 
 
 @pytest.mark.parametrize("value", [
