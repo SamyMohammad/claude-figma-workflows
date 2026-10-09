@@ -75,6 +75,19 @@ def _check_meta(meta: dict, node: dict) -> None:
         raise CoreError("BUNDLE_INVALID", f"Crop exceeds pixel size: {node['path']}")
 
 
+def _boxes_overlap(first: list, second: list) -> bool:
+    ax, ay, aw, ah = first
+    bx, by, bw, bh = second
+    return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
+
+
+def _check_comparison_policy(policy: dict) -> None:
+    ignored = [region["box"] for region in policy["ignored"]]
+    for critical in policy["critical"]:
+        if any(_boxes_overlap(critical["box"], box) for box in ignored):
+            raise CoreError("BUNDLE_INVALID", "Critical and ignored regions overlap")
+
+
 def validate_bundle(root: Path) -> dict:
     """Validate bundle structure and references, without verifying file hashes."""
     root = root.resolve()
@@ -94,6 +107,7 @@ def validate_bundle(root: Path) -> dict:
                        ("comparison-policy", "comparison-policy.json")):
         documents[kind] = read_json(_inside(root, name))
         validate_document(kind, documents[kind])
+    _check_comparison_policy(documents["comparison-policy"])
     for name in ("tokens-approval.json", "policy-approval.json", "visual-approval.json", "goldens-approval.json"):
         if (root / name).exists():
             validate_document("approval", read_json(_inside(root, name)))
@@ -105,10 +119,24 @@ def validate_bundle(root: Path) -> dict:
         raise CoreError("BUNDLE_INVALID", "Duplicate node IDs or paths")
     if set(ids) != set(manifest["scope"]) or set(ids) & set(manifest["excludedNodes"]):
         raise CoreError("BUNDLE_INVALID", "Node scope mismatch")
+    nodes_by_id = {node["id"]: node for node in manifest["nodes"]}
     mapped = [(entry["nodeId"], entry["variant"], entry["platform"])
               for entry in documents["component-map"]["components"]]
-    if len(mapped) != len(set(mapped)) or any(node_id not in ids for node_id, _, _ in mapped):
+    if len(mapped) != len(set(mapped)) or any(
+        node_id not in nodes_by_id
+        or nodes_by_id[node_id]["kind"] != "component"
+        or nodes_by_id[node_id]["variant"] != variant
+        for node_id, variant, _ in mapped
+    ):
         raise CoreError("BUNDLE_INVALID", "Invalid component mapping references")
+    for font in documents["fonts"]["fonts"]:
+        path = font["path"]
+        if path is not None:
+            _inside(root, path)
+        if font["status"] == "available" and (
+            path is None or font["sha256"] is None or path not in files
+        ):
+            raise CoreError("BUNDLE_INVALID", "Available font has no file reference")
     asset_paths = [entry["path"] for entry in documents["assets"]["assets"]]
     if len(asset_paths) != len(set(asset_paths)):
         raise CoreError("BUNDLE_INVALID", "Duplicate asset paths")

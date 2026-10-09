@@ -113,3 +113,69 @@ def test_timestamp_must_explicitly_be_utc(tmp_path):
     manifest["extractedAt"] = "2026-10-09T00:00:00+02:00"
     with pytest.raises(CoreError, match="UTC timestamp"):
         validate_document("manifest", manifest)
+
+
+def test_critical_region_cannot_overlap_ignored_region(tmp_path):
+    root = make_fixture(tmp_path / "bundle")
+    path = root / "comparison-policy.json"
+    policy = read_json(path)
+    policy["ignored"] = [{"box": [2, 2, 8, 8], "reason": "synthetic mask"}]
+    policy["critical"] = [{"id": "control", "box": [9, 9, 5, 5], "maxChangedRatio": 0}]
+    path.write_text(json.dumps(policy), encoding="utf-8")
+    with pytest.raises(CoreError, match="overlap"):
+        validate_bundle(root)
+
+
+@pytest.mark.parametrize("node_index, variant", [(0, None), (2, "other")])
+def test_component_mapping_must_match_component_node(tmp_path, node_index, variant):
+    root = make_fixture(tmp_path / "bundle")
+    node = read_json(root / "manifest.json")["nodes"][node_index]
+    path = root / "component-map.json"
+    mapping = read_json(path)
+    mapping["components"] = [{"nodeId": node["id"], "variant": variant,
+                              "platform": "flutter", "path": "lib/button.dart",
+                              "symbol": "Button", "sourceHash": "a" * 64}]
+    path.write_text(json.dumps(mapping), encoding="utf-8")
+    with pytest.raises(CoreError, match="component mapping"):
+        validate_bundle(root)
+
+
+def test_available_font_requires_recorded_file(tmp_path):
+    root = make_fixture(tmp_path / "bundle")
+    path = root / "fonts.json"
+    fonts = read_json(path)
+    fonts["fonts"] = [{"family": "Synthetic", "weight": 400,
+                       "path": "fonts/synthetic.ttf", "sha256": "a" * 64,
+                       "status": "available", "license": "approved"}]
+    path.write_text(json.dumps(fonts), encoding="utf-8")
+    with pytest.raises(CoreError, match="font.*file reference"):
+        validate_bundle(root)
+
+
+def test_font_path_cannot_escape_through_symlink(tmp_path):
+    root = make_fixture(tmp_path / "bundle")
+    outside = tmp_path / "outside.ttf"
+    outside.write_bytes(b"synthetic")
+    (root / "fonts").mkdir()
+    (root / "fonts/synthetic.ttf").symlink_to(outside)
+    manifest_path = root / "manifest.json"
+    manifest = read_json(manifest_path)
+    manifest["files"]["fonts/synthetic.ttf"] = "a" * 64
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    fonts_path = root / "fonts.json"
+    fonts = read_json(fonts_path)
+    fonts["fonts"] = [{"family": "Synthetic", "weight": 400,
+                       "path": "fonts/synthetic.ttf", "sha256": "a" * 64,
+                       "status": "available", "license": "approved"}]
+    fonts_path.write_text(json.dumps(fonts), encoding="utf-8")
+    with pytest.raises(CoreError, match="leaves its root"):
+        validate_bundle(root)
+
+
+def test_float_overflow_in_nested_meta_is_rejected(tmp_path):
+    root = make_fixture(tmp_path / "bundle")
+    path = root / "screens/home/meta.json"
+    text = path.read_text(encoding="utf-8").replace('"insets": [', '"insets": [1e999, ')
+    path.write_text(text, encoding="utf-8")
+    with pytest.raises(CoreError, match="non-finite"):
+        read_json(path)
