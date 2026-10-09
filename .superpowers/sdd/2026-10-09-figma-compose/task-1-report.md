@@ -71,3 +71,37 @@ Compose schemas reject unknown fields, unsupported versions/modes/types, express
 Root cause is the missing approved portable boundary. Changes are limited to that boundary, CLI surface and its packaging expectations. Existing core tests pass; no SAT app/cache changes, credential discovery or auto-approval. Production Compose inputs do not import another installation's internal core package. C1 includes no Kotlin compilation or font-file verification: those belong to subsequent C2/C3 work. Receipt JSON alone is not proof of current source approval; consumers must freshly export via the explicit trusted core command as the next task requires.
 
 No remaining blocker or architectural decision. No tests skipped. Full regression repeated because the bridge regression and required packaging expectations changed after the initial run.
+
+
+## Review fix round 1
+
+Addressed both Important findings from `task-1-review.md`, against previous head `a921173`.
+
+Changed files:
+- `plugins/figma-compose/schemas/config.schema.json`: identifier patterns now require the complete string and at least one non-underscore character per package/resource segment or token symbol. Portable `(?![\s\S])` end assertions avoid the trailing-newline behavior of `$`.
+- `plugins/figma-compose/scripts/compose_adapter/inputs.py`: fullmatch validates every symbol segment, rejects underscore-only segments, and retains keyword rejection.
+- `plugins/figma-compose/schemas/receipt.schema.json`: shared `$defs.mode` and `$defs.token` replace identical light/dark token definitions; all existing supported-type/value constraints remain unchanged.
+- `tests/scripts/test_compose_inputs.py`: regressions cover `_`, `__`, and `validName\n` for token/package/resource; assert schema-level rejection; assert both modes use shared definitions; test invalid values in each mode; verify valid underscore-prefixed identifiers remain accepted.
+- This report.
+
+RED command:
+`.venv/Scripts/python.exe -m pytest tests/scripts/test_compose_inputs.py -k 'full_string or shared' -q`
+Result: exit 1, `10 failed, 6 passed, 32 deselected in 6.57s`.
+Identifier regression failures (all nine parameter combinations):
+```text
+> with pytest.raises(ComposeError):
+E Failed: DID NOT RAISE ComposeError
+```
+Shared schema failure:
+```text
+> assert modes == {"light": {"$ref": "#/$defs/mode"}, "dark": {"$ref": "#/$defs/mode"}}
+E AssertionError: assert {'light': {'type': ...}, 'dark': {'type': ...}} == {'light': {'$ref': '#/$defs/mode'}, 'dark': {'$ref': '#/$defs/mode'}}
+```
+
+GREEN command:
+`.venv/Scripts/python.exe -m pytest tests/scripts/test_adapter_export.py tests/scripts/test_compose_inputs.py -q`
+After code fixes: exit 0, `61 passed in 18.86s`.
+After adding schema-level rejection assertions and valid underscore-prefix coverage: exit 0, `62 passed in 19.39s`.
+`git diff --check`: exit 0, no output.
+
+Self-review: symbol validation now rejects the reproduced invalid inputs at both schema and runtime boundaries while allowing legitimate `_example`, `_1`, and `__space1`. Shared token schema is identical to the previous per-mode contract and both modes reject invalid dimension types/units. No scope expansion, production approvals, dependencies or controller-file edits. No blockers. Full suite was not repeated for this focused round: changes are restricted to Compose input validation and equivalent receipt-schema factoring, covered by the required exporter/input suite; the prior full result remains recorded above.

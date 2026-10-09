@@ -7,7 +7,7 @@
     },
     "packageName": {
       "type": "string",
-      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+      "pattern": "^(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*)(?:\\.(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*))*(?![\\s\\S])"
     },
     "themeDirectory": {
       "type": "string",
@@ -28,7 +28,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "string",
-        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        "pattern": "^(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*)(?![\\s\\S])"
       }
     },
     "material": {
@@ -299,7 +299,7 @@
           "properties": {
             "resource": {
               "type": "string",
-              "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              "pattern": "^(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*)(?:\\.(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*))*(?![\\s\\S])"
             },
             "projectPath": {
               "type": "string",

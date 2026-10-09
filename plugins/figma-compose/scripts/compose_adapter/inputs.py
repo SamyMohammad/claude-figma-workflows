@@ -35,7 +35,8 @@ def _path(relative: str) -> None:
 
 
 def _symbol(value: str) -> None:
-    if any(part in _KEYWORDS for part in value.split(".")):
+    if any(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", part) is None
+           or not part.strip("_") or part in _KEYWORDS for part in value.split(".")):
         raise ComposeError("SYMBOL_INVALID", "Invalid Kotlin identifier")
 
 

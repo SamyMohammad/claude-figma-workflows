@@ -131,3 +131,59 @@ def test_bridge_preserves_blocked_json_code(monkeypatch):
     with pytest.raises(ComposeError) as error:
         run_core(["python"], [])
     assert error.value.code == "APPROVAL_INVALID"
+
+
+@pytest.mark.parametrize("symbol", ["_", "__", "validName\n"])
+@pytest.mark.parametrize("target", ["token", "package", "resource"])
+def test_full_string_kotlin_identifiers_reject_reserved_or_trailing_characters(symbol, target):
+    from compose_adapter.inputs import load_inputs
+    from compose_adapter.errors import ComposeError
+    from fixtures.compose_receipt import make_receipt
+    settings = config()
+    if target == "token":
+        settings["names"] = {"space.small": symbol}
+    elif target == "package":
+        settings["packageName"] = "com." + symbol
+    else:
+        settings["fonts"] = {"Roboto": {"400": {"resource": "R.font." + symbol,
+            "projectPath": "res/font/test.ttf", "sha256": "a" * 64}}}
+    import json
+    from pathlib import Path
+    from jsonschema import Draft202012Validator
+    schema = json.loads((Path(__file__).parents[2] / "plugins/figma-compose/schemas/config.schema.json").read_text())
+    assert not Draft202012Validator(schema).is_valid(settings)
+    with pytest.raises(ComposeError):
+        load_inputs(make_receipt(), settings)
+
+
+def test_receipt_modes_reference_one_shared_token_contract():
+    import json
+    from pathlib import Path
+    schema = json.loads((Path(__file__).parents[2] / "plugins/figma-compose/schemas/receipt.schema.json").read_text())
+    modes = schema["properties"]["resolvedByMode"]["properties"]
+    assert modes == {"light": {"$ref": "#/$defs/mode"}, "dark": {"$ref": "#/$defs/mode"}}
+    assert schema["$defs"]["mode"]["additionalProperties"] == {"$ref": "#/$defs/token"}
+
+
+@pytest.mark.parametrize("mode", ["light", "dark"])
+@pytest.mark.parametrize("value", [True, {"value": "16", "unit": "px"}, {"value": 16, "unit": "dp"}])
+def test_shared_mode_schema_rejects_invalid_token_values(mode, value):
+    from compose_adapter.inputs import load_inputs
+    from compose_adapter.errors import ComposeError
+    from fixtures.compose_receipt import make_receipt
+    receipt = make_receipt()
+    receipt["resolvedByMode"][mode]["shape.radius"]["value"] = value
+    with pytest.raises(ComposeError):
+        load_inputs(receipt, config())
+
+
+def test_valid_underscore_prefixed_identifiers_remain_supported():
+    from compose_adapter.inputs import load_inputs
+    from fixtures.compose_receipt import make_receipt
+    settings = config()
+    settings["names"] = {"space.small": "__space1"}
+    settings["packageName"] = "com._example.theme"
+    settings["fonts"] = {"Roboto": {"400": {"resource": "R.font._1",
+        "projectPath": "res/font/test.ttf", "sha256": "a" * 64}}}
+    _, result = load_inputs(make_receipt(), settings)
+    assert result["names"]["space.small"] == "__space1"
