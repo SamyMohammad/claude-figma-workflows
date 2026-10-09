@@ -1,13 +1,15 @@
 """Versioned design bundle validation."""
 
 from datetime import datetime, timezone
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 from .documents import read_json
 from .errors import CoreError
+from .paths import check_collisions, safe_path
+from .storage import file_hash
 
 
 _SCHEMAS = Path(__file__).resolve().parents[2] / "schemas"
@@ -15,19 +17,8 @@ _KINDS = frozenset({"manifest", "meta", "fonts", "component-map", "assets", "app
 _REQUIRED = ("tokens.json", "fonts.json", "component-map.json", "assets/manifest.json", "comparison-policy.json")
 
 
-def _relative(value: str) -> Path:
-    posix = PurePosixPath(value)
-    if (not value or "\\" in value or value.startswith("/") or ":" in value
-            or any(part in ("", ".", "..") for part in value.split("/"))):
-        raise CoreError("PATH_INVALID", "Invalid relative path in bundle")
-    return Path(*posix.parts)
-
-
 def _inside(root: Path, relative: str) -> Path:
-    path = root / _relative(relative)
-    if not path.resolve().is_relative_to(root.resolve()):
-        raise CoreError("PATH_INVALID", "Bundle path leaves its root")
-    return path
+    return safe_path(root, relative)
 
 
 def _utc(value: str, label: str) -> None:
@@ -89,11 +80,12 @@ def _check_comparison_policy(policy: dict) -> None:
 
 
 def validate_bundle(root: Path) -> dict:
-    """Validate bundle structure and references, without verifying file hashes."""
+    """Validate bundle structure, references, and recorded file hashes."""
     root = root.resolve()
-    manifest = read_json(root / "manifest.json")
+    manifest = read_json(_inside(root, "manifest.json"))
     validate_document("manifest", manifest)
     files = manifest["files"]
+    check_collisions(list(files))
     for name in files:
         if not _inside(root, name).is_file():
             raise CoreError("BUNDLE_INVALID", f"Missing recorded file: {name}")
@@ -165,4 +157,12 @@ def validate_bundle(root: Path) -> dict:
                 raise CoreError("BUNDLE_INVALID", "Comparison region exceeds pixel size")
     if manifest["status"] == "complete" and any(node["status"] != "complete" for node in manifest["nodes"]):
         raise CoreError("BUNDLE_INVALID", "Complete bundle has incomplete nodes")
+    if manifest["status"] == "complete" and any(
+        asset["status"] != "available" for asset in documents["assets"]["assets"]
+    ):
+        raise CoreError("BUNDLE_INVALID", "Complete bundle has missing assets")
+    check_collisions(list(files) + paths)
+    for name, expected in files.items():
+        if file_hash(_inside(root, name)) != expected:
+            raise CoreError("BUNDLE_INVALID", f"Recorded file hash mismatch: {name}")
     return manifest
