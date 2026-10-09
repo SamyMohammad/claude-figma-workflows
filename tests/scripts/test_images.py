@@ -45,6 +45,22 @@ def test_embedded_srgb_profile_is_accepted(tmp_path):
     assert load_png(path, "srgb").getpixel((0, 0)) == (255, 255, 255, 255)
 
 
+def test_srgb_named_profile_with_altered_red_colorant_is_rejected(tmp_path):
+    path = tmp_path / "capture.png"
+    profile = bytearray(ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes())
+    count = int.from_bytes(profile[128:132], "big")
+    for entry in range(132, 132 + count * 12, 12):
+        if profile[entry:entry + 4] == b"rXYZ":
+            offset = int.from_bytes(profile[entry + 4:entry + 8], "big")
+            profile[offset + 8:offset + 12] = b"\x00\x00\x00\x00"
+            break
+    else:
+        pytest.fail("The test sRGB profile has no red colorant")
+    Image.new("RGB", (1, 1), "white").save(path, icc_profile=bytes(profile))
+    with pytest.raises(CoreError, match="profile"):
+        load_png(path, "srgb")
+
+
 def test_unrecognized_gamma_is_rejected(tmp_path):
     path = tmp_path / "capture.png"
     buffer = io.BytesIO()
