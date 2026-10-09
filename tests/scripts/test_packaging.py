@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PLUGIN = ROOT / "plugins" / "figma-core"
-SKILLS = {"figma-extract", "token-audit", "visual-verify", "figma-build"}
+SKILLS = {"figma-extract", "token-audit", "visual-verify", "figma-build", "adapter-export"}
 
 
 def test_marketplace_exports_existing_core_skills():
@@ -17,7 +17,7 @@ def test_marketplace_exports_existing_core_skills():
     assert marketplace["name"] == "claude-figma-workflows"
     assert marketplace["plugins"] == [{"name": "figma-core", "source": "./plugins/figma-core"}]
     assert manifest["name"] == "figma-core"
-    assert manifest["version"] == "0.1.0"
+    assert manifest["version"] == "0.1.1"
     skill_files = list((PLUGIN / "skills").glob("*/SKILL.md"))
     assert {path.parent.name for path in skill_files} == SKILLS
     for skill_file in skill_files:
