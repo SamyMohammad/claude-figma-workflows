@@ -1,0 +1,102 @@
+{
+  "budget": {
+    "limit": 0,
+    "reserved": 0,
+    "spent": 0,
+    "windowId": "synthetic"
+  },
+  "capabilities": [],
+  "excludedNodes": [],
+  "extractedAt": "2026-10-09T00:00:00Z",
+  "fileKey": "synthetic-core-v1",
+  "files": {
+    "README.md": "9f20d443bfbf06b07e99bf2f0e057b3cb66c6edae83e81d5a8155166e5d2389b",
+    "assets/manifest.json": "d821b575707f49bf23b667d09cfc46a3edbdf82627aa5828183ab815bcce1b0d",
+    "comparison-policy.json": "bab617baf093902725f5d8462d337d0746932cc3e330fb8e11187e3795476f16",
+    "component-map.json": "cd93067264106b391f503fa3c491ab7f13513eeb457caf15dd2fd68df2831359",
+    "components/badge/default/context.md": "1277d93f13e715c4fb51c8107ef860c024471b2b1607799502068de1925cc820",
+    "components/badge/default/meta.json": "631773142266b8cfe0ff447e8acd5556257105e8f75401f3ccc65f3b2d067f3b",
+    "components/badge/default/reference.png": "b95b5a2acb0299c27d6aa8a20b8e3778a998655ff7a7088bf335189edafd1a4e",
+    "components/button/default/context.md": "bbb0498d0997b525ff9201fee224a312cb603fa0b7d151f8cb04b47a1421f142",
+    "components/button/default/meta.json": "16641c2a03e1a7bae90f31df87fc47d0fe85f94dd5a502c1b90b1b245a1db9c4",
+    "components/button/default/reference.png": "b95b5a2acb0299c27d6aa8a20b8e3778a998655ff7a7088bf335189edafd1a4e",
+    "components/card/default/context.md": "3c0c0939654db6d80417f77309212229daef93826bd0f7334a4ebfe4513e945a",
+    "components/card/default/meta.json": "990035894640b500a1eccb77da56b71a0680dd0a40d5325a69836cd15ab6f650",
+    "components/card/default/reference.png": "b95b5a2acb0299c27d6aa8a20b8e3778a998655ff7a7088bf335189edafd1a4e",
+    "fonts.json": "630b4c1ea78a5577540db2c24e62e94dd1e7ca8ae6a4e9979bdc4d6ba8b10f01",
+    "screens/home/context.md": "12070473d01af81777082d2f6efc95a8b4f7daef64dc8b7c7d219b136906cfaa",
+    "screens/home/meta.json": "78bd4d2696af5ae9d45a3b5cea6ac2ec1c88c2ac0e8b905da5223979820be713",
+    "screens/home/reference.png": "35751aeda8d11b639ce230d0a3f166f33fb375ebe963bd1b68548a3404ebcd3d",
+    "screens/review/context.md": "48b6e4a55c0740468634490cf3c61864df7c237bd50a3513586ea2f7c4f1cd10",
+    "screens/review/meta.json": "769bfddea4a11f8f0b3edff1fa948ee24cd8fc0936eaa490eafbc0234a664c96",
+    "screens/review/reference.png": "35751aeda8d11b639ce230d0a3f166f33fb375ebe963bd1b68548a3404ebcd3d",
+    "tokens.json": "ed28bb918918eee4251f8f9b36ec25b75209ef87ac474bdb5360cbf122879509"
+  },
+  "freshness": "unverified",
+  "nodes": [
+    {
+      "errorCode": null,
+      "id": "synthetic:screen:home",
+      "kind": "screen",
+      "path": "screens/home",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": null
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:screen:review",
+      "kind": "screen",
+      "path": "screens/review",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": null
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:component:button",
+      "kind": "component",
+      "path": "components/button/default",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": "default"
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:component:card",
+      "kind": "component",
+      "path": "components/card/default",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": "default"
+    },
+    {
+      "errorCode": null,
+      "id": "synthetic:component:badge",
+      "kind": "component",
+      "path": "components/badge/default",
+      "sourceRevision": "synthetic-v1",
+      "status": "complete",
+      "variant": "default"
+    }
+  ],
+  "resume": {
+    "nextNode": null,
+    "reason": null
+  },
+  "schemaVersion": 1,
+  "scope": [
+    "synthetic:screen:home",
+    "synthetic:screen:review",
+    "synthetic:component:button",
+    "synthetic:component:card",
+    "synthetic:component:badge"
+  ],
+  "sourceRevision": "synthetic-v1",
+  "status": "complete",
+  "synthetic": true,
+  "tokenModes": [
+    "light",
+    "dark"
+  ]
+}

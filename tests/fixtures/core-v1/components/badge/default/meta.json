@@ -1,0 +1,35 @@
+{
+  "animation": "settled",
+  "colorSpace": "srgb",
+  "crop": [
+    0,
+    0,
+    20,
+    20
+  ],
+  "direction": "ltr",
+  "fontHashes": {},
+  "insets": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "locale": "en-US",
+  "logicalSize": [
+    20,
+    20
+  ],
+  "nodeId": "synthetic:component:badge",
+  "pixelSize": [
+    20,
+    20
+  ],
+  "platform": "synthetic",
+  "renderer": "pillow",
+  "scale": 1,
+  "schemaVersion": 1,
+  "sourceRevision": "synthetic-v1",
+  "textScale": 1,
+  "theme": "light"
+}
