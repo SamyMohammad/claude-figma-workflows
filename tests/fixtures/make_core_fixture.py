@@ -41,19 +41,23 @@ def make_fixture(root: Path) -> Path:
                 "animation": "settled", "colorSpace": "srgb",
             })
     _write_json(root / "tokens.json", {
-        "base": {"space": {"small": {"$type": "dimension", "$value": "8px",
+        "base": {"space": {"small": {"$type": "dimension", "$value": {"value": 8, "unit": "px"},
                                       "$extensions": {"org.claude-figma-workflows.source":
                                                       {"nodeId": "synthetic:screen:home", "kind": "inferred"}}}}},
-        "light": {"color": {"primary": {"$type": "color", "$value": "#336699"}},
+        "light": {"color": {"primary": {"$type": "color", "$value": {
+            "colorSpace": "srgb", "components": [0.2, 0.4, 0.6], "alpha": 1}}},
                   "space": {"small": {"$type": "dimension", "$value": "{base.space.small}"}},
                   "type": {"body": {"$type": "typography", "$value": {
-                      "fontFamily": "Synthetic Sans", "fontSize": "14px", "fontWeight": 400,
-                      "lineHeight": 1.4, "letterSpacing": "0px"}}}},
-        "dark": {"color": {"primary": {"$type": "color", "$value": "#336699"}},
+                      "fontFamily": "Synthetic Sans", "fontSize": {"value": 14, "unit": "px"},
+                      "fontWeight": 400, "lineHeight": 1.4,
+                      "letterSpacing": {"value": 0, "unit": "px"}}}}},
+        "dark": {"color": {"primary": {"$type": "color", "$value": {
+            "colorSpace": "srgb", "components": [0.2, 0.4, 0.6], "alpha": 1}}},
                  "space": {"small": {"$type": "dimension", "$value": "{base.space.small}"}},
                  "type": {"body": {"$type": "typography", "$value": {
-                     "fontFamily": "Synthetic Sans", "fontSize": "14px", "fontWeight": 400,
-                     "lineHeight": 1.4, "letterSpacing": "0px"}}}},
+                     "fontFamily": "Synthetic Sans", "fontSize": {"value": 14, "unit": "px"},
+                     "fontWeight": 400, "lineHeight": 1.4,
+                     "letterSpacing": {"value": 0, "unit": "px"}}}}},
     })
     _write_json(root / "fonts.json", {"schemaVersion": 1, "fonts": []})
     _write_json(root / "component-map.json", {"schemaVersion": 1, "components": []})
