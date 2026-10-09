@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -32,10 +33,12 @@ def test_installed_plugin_carries_exact_runtime_lock():
 def test_absolute_plugin_cli_validates_from_consumer_with_spaces(tmp_path):
     consumer = tmp_path / "consumer directory with spaces"
     consumer.mkdir()
+    installed_plugin = tmp_path / "plugin with spaces"
+    shutil.copytree(PLUGIN, installed_plugin, ignore=shutil.ignore_patterns("__pycache__"))
     result = subprocess.run(
         [
             sys.executable,
-            str(PLUGIN / "scripts" / "core.py"),
+            str(installed_plugin / "scripts" / "core.py"),
             "validate",
             "--bundle",
             str(ROOT / "tests" / "fixtures" / "core-v1"),
@@ -46,3 +49,8 @@ def test_absolute_plugin_cli_validates_from_consumer_with_spaces(tmp_path):
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads(result.stdout) == {
+        "bundleStatus": "complete",
+        "freshness": "unverified",
+        "status": "passed",
+    }
