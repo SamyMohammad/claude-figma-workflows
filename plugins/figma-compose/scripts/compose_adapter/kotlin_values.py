@@ -6,16 +6,35 @@ from decimal import Decimal
 from .errors import ComposeError
 
 
+# DTCG Format 2025.10, section 8.4: named weights are exact numeric aliases.
+_FONT_WEIGHTS = {
+    'thin': 100, 'hairline': 100, 'extra-light': 200, 'ultra-light': 200,
+    'light': 300, 'normal': 400, 'regular': 400, 'book': 400, 'medium': 500,
+    'semi-bold': 600, 'demi-bold': 600, 'bold': 700, 'extra-bold': 800,
+    'ultra-bold': 800, 'black': 900, 'heavy': 900, 'extra-black': 950, 'ultra-black': 950,
+}
+
+
+def font_weight(value):
+    weight = _FONT_WEIGHTS.get(value, value)
+    if not isinstance(weight, (int, float)) or not math.isfinite(weight) or int(weight) != weight or not 1 <= weight <= 1000:
+        raise ComposeError('VALUE_RANGE', 'FontWeight requires integral weight in [1, 1000]')
+    return int(weight)
+
+
 def number(value):
     try:
-        result = float(value)
+        source = Decimal(str(value))
+        if not source.is_finite():
+            raise ValueError('non-finite number')
+        result = float(source)
         packed = struct.pack('f', result)
         target = struct.unpack('f', packed)[0]
     except (ValueError, TypeError, OverflowError, struct.error):
         raise ComposeError('VALUE_RANGE', 'Value cannot be represented by Kotlin Float') from None
-    if not math.isfinite(target) or (result != 0 and target == 0):
+    if not math.isfinite(target) or (source != 0 and target == 0):
         raise ComposeError('VALUE_RANGE', 'Value cannot be represented by Kotlin Float')
-    return str(value) if isinstance(value, int) else repr(value)
+    return str(value) if isinstance(value, (int, Decimal)) else repr(value)
 
 
 def dimension(value, config, unit='dp', nonnegative=False):
@@ -27,7 +46,7 @@ def dimension(value, config, unit='dp', nonnegative=False):
     if nonnegative and amount < 0:
         raise ComposeError('VALUE_RANGE', 'Negative shape or font size')
     literal = format(amount, 'f').rstrip('0').rstrip('.') if '.' in format(amount, 'f') else str(amount)
-    number(float(amount))
+    number(amount)
     if '.' not in literal and not -2147483648 <= amount <= 2147483647:
         literal += '.0'
     return literal + '.' + unit
@@ -45,10 +64,7 @@ def kotlin_value(token, config, shape=False):
         return 'FontFamily', 'FontFamily(' + ', '.join('Font(' + font['resource'] + ', weight = FontWeight(' + weight + '))'
             for weight, font in sorted(fonts.items(), key=lambda item: int(item[0]))) + ')'
     if kind == 'fontWeight':
-        weight = {'normal': 400, 'bold': 700}.get(value, value)
-        if not isinstance(weight, (int, float)) or int(weight) != weight:
-            raise ComposeError('VALUE_RANGE', 'FontWeight requires integral weight')
-        return 'FontWeight', 'FontWeight(' + str(int(weight)) + ')'
+        return 'FontWeight', 'FontWeight(' + str(font_weight(value)) + ')'
     if kind == 'dimension':
         return 'Dp', dimension(value, config, nonnegative=shape)
     if kind == 'color':
@@ -62,10 +78,7 @@ def kotlin_value(token, config, shape=False):
     if kind == 'cubicBezier':
         return 'CubicBezierEasing', 'CubicBezierEasing(' + ', '.join(number(v) + 'f' for v in value) + ')'
     if kind == 'typography':
-        weight_value = {'normal': 400, 'bold': 700}.get(value['fontWeight'], value['fontWeight'])
-        if int(weight_value) != weight_value:
-            raise ComposeError('VALUE_RANGE', 'FontWeight requires integral weight')
-        weight = str(int(weight_value))
+        weight = str(font_weight(value['fontWeight']))
         font = config['fonts'].get(value['fontFamily'], {}).get(weight)
         if font is None:
             raise ComposeError('FONT_MAPPING', 'Every font family/weight requires a resource mapping')
@@ -73,6 +86,6 @@ def kotlin_value(token, config, shape=False):
         line = Decimal(size[:-3]) * Decimal(str(value['lineHeight']))
         return 'TextStyle', ('TextStyle(fontFamily = FontFamily(Font(' + font['resource'] +
             ', weight = FontWeight(' + weight + '))), fontWeight = FontWeight(' + weight +
-            '), fontSize = ' + size + ', lineHeight = ' + number(float(line)) +
+            '), fontSize = ' + size + ', lineHeight = ' + number(line) +
             '.sp, letterSpacing = ' + dimension(value['letterSpacing'], config, 'sp') + ')')
     raise ComposeError('TOKEN_TYPE', 'Unsupported Kotlin token type')

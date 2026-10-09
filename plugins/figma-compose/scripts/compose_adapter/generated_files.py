@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import tempfile
+from contextlib import ExitStack
 from pathlib import Path
 
 from .core_bridge import run_core
@@ -68,10 +69,17 @@ def apply_theme(project: Path, files: dict[str, str], core_command: list[str], s
     contents['.workflow/compose-theme.json'] = json.dumps(manifest, sort_keys=True, indent=2) + '\n'
     backups = {destination: destination.read_bytes() if destination.exists() else None for destination in destinations}
     replaced = []
-    with tempfile.TemporaryDirectory(prefix='compose-stage-') as stage:
+    with ExitStack() as stages:
         staged = []
-        for index, text in enumerate(contents.values()):
+        for index, (text, destination) in enumerate(zip(contents.values(), destinations)):
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            if checked_paths(project, names, core_command) != destinations:
+                raise ComposeError('PATH_CHANGED', 'Validated destinations changed')
+            stage = stages.enter_context(tempfile.TemporaryDirectory(prefix='.compose-stage-', dir=destination.parent))
             path = Path(stage) / str(index)
+            relative = path.relative_to(project.resolve()).as_posix()
+            if checked_paths(project, [relative], core_command) != [path]:
+                raise ComposeError('PATH_CHANGED', 'Validated staging destination changed')
             path.write_bytes(text.encode('utf-8'))
             staged.append(path)
         fresh_identity(core_command, source_identity)

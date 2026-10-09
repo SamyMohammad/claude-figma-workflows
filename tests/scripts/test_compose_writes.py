@@ -158,3 +158,39 @@ def test_real_core_rejects_changed_bundle(tmp_path):
     with pytest.raises(ValueError):
         apply_theme(project, {'A.kt': 'a'}, command, identity)
     assert not (project / 'A.kt').exists()
+
+
+def test_stage_uses_each_validated_destination_filesystem(publication, monkeypatch):
+    import errno
+    from pathlib import Path
+    root, identity = publication
+    original = os.replace
+    def replace(source, destination):
+        # Model each destination parent as its own volume/mount boundary.
+        if not Path(source).is_relative_to(Path(destination).parent):
+            raise OSError(errno.EXDEV, 'Invalid cross-device link')
+        return original(source, destination)
+    monkeypatch.setattr(os, 'replace', replace)
+    result = apply_theme(root, {'theme/AppTheme.kt': 'theme', 'other/AppTokens.kt': 'tokens'}, ['trusted'], identity)
+    assert result['status'] == 'passed'
+    assert (root / 'theme/AppTheme.kt').read_text() == 'theme'
+    assert (root / 'other/AppTokens.kt').read_text() == 'tokens'
+
+
+def test_config_mutation_during_staging_blocks_publication(publication, monkeypatch):
+    from pathlib import Path
+    root, identity = publication
+    config_path = root / 'config.json'
+    config_path.write_text('{}')
+    identity.update({'configPath': str(config_path), 'configHash': content_hash({})})
+    original = Path.write_bytes
+    def write(path, data):
+        result = original(path, data)
+        if path.parent.name.startswith('.compose-stage-'):
+            config_path.write_text('{"changed":true}')
+        return result
+    monkeypatch.setattr(Path, 'write_bytes', write)
+    with pytest.raises(ValueError, match='config changed'):
+        apply_theme(root, {'theme/AppTheme.kt': 'generated'}, ['trusted'], identity)
+    assert not (root / 'theme/AppTheme.kt').exists()
+    assert not list(root.rglob('.compose-stage-*'))

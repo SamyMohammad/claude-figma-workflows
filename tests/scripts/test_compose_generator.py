@@ -105,3 +105,36 @@ def test_missing_font_mapping_blocks():
     config['fonts'] = {}
     with pytest.raises(ValueError, match='font'):
         render_theme(make_receipt(), config)
+
+
+@pytest.mark.parametrize('alias,weight', [
+    ('thin', 100), ('hairline', 100), ('extra-light', 200), ('ultra-light', 200),
+    ('light', 300), ('normal', 400), ('regular', 400), ('book', 400), ('medium', 500),
+    ('semi-bold', 600), ('demi-bold', 600), ('bold', 700), ('extra-bold', 800),
+    ('ultra-bold', 800), ('black', 900), ('heavy', 900), ('extra-black', 950), ('ultra-black', 950)])
+def test_all_named_weights_preserve_numeric_weight_and_resource(alias, weight):
+    from compose_adapter.kotlin_values import kotlin_value
+    config = fixture_config()
+    config['fonts']['Roboto'][str(weight)] = {'resource': 'R.font.selected',
+        'projectPath': 'res/font/selected.ttf', 'sha256': 'a' * 64}
+    assert kotlin_value({'type': 'fontWeight', 'value': alias}, config) == ('FontWeight', f'FontWeight({weight})')
+    value = {'fontFamily': 'Roboto', 'fontWeight': alias, 'fontSize': {'value': 14, 'unit': 'px'},
+             'lineHeight': 1.4, 'letterSpacing': {'value': 0, 'unit': 'px'}}
+    kind, rendered = kotlin_value({'type': 'typography', 'value': value}, config)
+    assert kind == 'TextStyle'
+    assert f'Font(R.font.selected, weight = FontWeight({weight}))' in rendered
+
+
+@pytest.mark.parametrize('derived', ['rem', 'lineHeight'])
+def test_decimal_nonzero_underflow_is_rejected(derived):
+    from compose_adapter.generator import render_theme
+    receipt = make_receipt()
+    config = fixture_config()
+    if derived == 'rem':
+        receipt['resolvedByMode']['light']['space.small']['value'] = {'value': 1e-300, 'unit': 'rem'}
+        config['remBasePx'] = 1e-300
+    else:
+        receipt['resolvedByMode']['light']['type.body']['value']['fontSize']['value'] = 1e-30
+        receipt['resolvedByMode']['light']['type.body']['value']['lineHeight'] = 1e-300
+    with pytest.raises(ValueError, match='represented'):
+        render_theme(receipt, config)
