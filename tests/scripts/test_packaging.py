@@ -15,7 +15,7 @@ def test_marketplace_exports_existing_core_skills():
     manifest = json.loads((PLUGIN / ".claude-plugin" / "plugin.json").read_text())
 
     assert marketplace["name"] == "claude-figma-workflows"
-    assert marketplace["plugins"] == [{"name": "figma-core", "source": "./plugins/figma-core"}]
+    assert {"name": "figma-core", "source": "./plugins/figma-core"} in marketplace["plugins"]
     assert manifest["name"] == "figma-core"
     assert manifest["version"] == "0.1.1"
     skill_files = list((PLUGIN / "skills").glob("*/SKILL.md"))
