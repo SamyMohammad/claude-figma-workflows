@@ -34,7 +34,7 @@ def main(argv=None):
             relative = output.resolve().relative_to(root).as_posix()
             if not relative.startswith('app/build/figma-candidates/'):
                 raise ComposeError('OUTPUT_INVALID', 'Capture metadata belongs in candidate build artifacts')
-            checked_paths(root, [relative], command)
+            (output,) = checked_paths(root, [relative], command)
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(json.dumps(actual, sort_keys=True, indent=2) + '\n', encoding='utf-8')
             print(json.dumps({'status': 'passed', 'actualMeta': str(output), 'imageHash': measured['imageHash'],

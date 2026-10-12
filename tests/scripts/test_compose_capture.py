@@ -114,7 +114,7 @@ def test_prepare_capture_cli_checks_theme_before_publication(tmp_path, capture, 
     output = project / 'app/build/figma-candidates/home/actual-meta.json'
     checked = []
     monkeypatch.setattr(compose, 'verify_rendered_theme', lambda *args: checked.append('identity'))
-    monkeypatch.setattr(compose, 'checked_paths', lambda *args: checked.append('paths'))
+    monkeypatch.setattr(compose, 'checked_paths', lambda *args: checked.append('paths') or [output])
     args = ['prepare-capture', '--bundle', str(tmp_path), '--config', str(tmp_path / 'config'),
             '--project', str(project), '--core-command-json', '["trusted-core"]',
             '--reference-meta', str(reference), '--measured', str(measured), '--image', str(image), '--output', str(output)]

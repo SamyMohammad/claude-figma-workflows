@@ -57,6 +57,7 @@ class ComposeCaptureTest {
     @Test @Config(qualifiers = "en-rUS-ldltr-w240dp-h160dp-notnight-mdpi")
     fun wideHome() = capture(GraphicNode.Home, width = 240)
     @Test fun scaledHome() = capture(GraphicNode.Home, scale = 1.5f)
+    // Text variants have no reference node in a Figma bundle: they are record-mode font smoke tests, not golden-review inputs.
     @Test fun robotoText() = capture(GraphicNode.Home, text = true)
     @Test @Config(qualifiers = "en-rUS-ldrtl-w240dp-h160dp-night-mdpi")
     fun rtlScaledRobotoText() = capture(GraphicNode.Review, width = 240, scale = 1.5f, text = true)
