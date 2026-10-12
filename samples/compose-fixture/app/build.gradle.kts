@@ -14,8 +14,10 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "ROBORAZZI_VERSION", "\"${libs.versions.roborazzi.get()}\"")
+        buildConfigField("String", "ROBOLECTRIC_VERSION", "\"${libs.versions.robolectric.get()}\"")
     }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
     testOptions.unitTests.isIncludeAndroidResources = true
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

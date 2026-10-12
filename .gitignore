@@ -12,3 +12,5 @@ dist/
 .env.*
 !.env.example
 artifacts/
+hs_err_pid*.log
+replay_pid*.log
