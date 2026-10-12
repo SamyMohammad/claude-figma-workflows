@@ -1,0 +1,6 @@
+{
+  "name": "claude-figma-workflows",
+  "description": "Audited Figma extraction and visual verification workflows",
+  "owner": {"name": "Claude Figma Workflows"},
+  "plugins": [{"name": "figma-core", "source": "./plugins/figma-core"}]
+}

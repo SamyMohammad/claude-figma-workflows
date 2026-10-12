@@ -1,0 +1,145 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "nodeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRevision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "logicalSize": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "pixelSize": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "scale": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "direction": {
+      "enum": [
+        "ltr",
+        "rtl"
+      ]
+    },
+    "theme": {
+      "enum": [
+        "light",
+        "dark"
+      ]
+    },
+    "fontHashes": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^(?!/|[A-Za-z]:|.*(?:^|/)\\.\\.(?:/|$)).+$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "containsText": {
+      "type": "boolean"
+    },
+    "platform": {
+      "type": "string",
+      "minLength": 1
+    },
+    "renderer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "textScale": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "crop": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "minItems": 4,
+      "maxItems": 4,
+      "items": false
+    },
+    "insets": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "animation": {
+      "const": "settled"
+    },
+    "colorSpace": {
+      "const": "srgb"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "nodeId",
+    "sourceRevision",
+    "logicalSize",
+    "pixelSize",
+    "scale",
+    "locale",
+    "direction",
+    "theme",
+    "fontHashes",
+    "containsText",
+    "platform",
+    "renderer",
+    "textScale",
+    "crop",
+    "insets",
+    "animation",
+    "colorSpace"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {}
+}

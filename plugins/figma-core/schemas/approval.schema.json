@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "enum": [
+        "tokens",
+        "policy",
+        "visual",
+        "goldens",
+        "reference"
+      ]
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approvedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "modes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "light",
+          "dark"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "kind",
+    "contentHash",
+    "owner",
+    "evidence",
+    "approvedAt",
+    "modes",
+    "deviations"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {}
+}

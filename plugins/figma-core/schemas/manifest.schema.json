@@ -1,0 +1,218 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "fileKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRevision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "extractedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "freshness": {
+      "enum": [
+        "verified",
+        "unverified"
+      ]
+    },
+    "scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "excludedNodes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "tokenModes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "light",
+          "dark"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "files": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^(?!/|[A-Za-z]:|.*(?:^|/)\\.\\.(?:/|$)).+$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "windowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "spent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "windowId",
+        "limit",
+        "spent",
+        "reserved"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "enum": [
+        "partial",
+        "complete",
+        "blocked"
+      ]
+    },
+    "resume": {
+      "type": "object",
+      "properties": {
+        "nextNode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "nextNode",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "synthetic",
+    "fileKey",
+    "sourceRevision",
+    "extractedAt",
+    "freshness",
+    "scope",
+    "excludedNodes",
+    "tokenModes",
+    "capabilities",
+    "nodes",
+    "files",
+    "budget",
+    "status",
+    "resume"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "node": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "screen",
+            "component"
+          ]
+        },
+        "variant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/|[A-Za-z]:|.*(?:^|/)\\.\\.(?:/|$)).+$"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "complete",
+            "failed"
+          ]
+        },
+        "sourceRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "variant",
+        "path",
+        "status",
+        "sourceRevision",
+        "errorCode"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
