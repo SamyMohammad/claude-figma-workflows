@@ -1,0 +1,7 @@
+{
+  "name": "figma-compose",
+  "version": "0.1.0",
+  "description": "Jetpack Compose adapter for figma-core: generates reviewable theme code, guides screens and candidate captures against verified Figma bundles",
+  "author": {"name": "Claude Figma Workflows"},
+  "dependencies": ["figma-core"]
+}
