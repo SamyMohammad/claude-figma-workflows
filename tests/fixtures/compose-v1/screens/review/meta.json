@@ -1,0 +1,36 @@
+{
+  "animation": "settled",
+  "colorSpace": "srgb",
+  "containsText": false,
+  "crop": [
+    0,
+    0,
+    160,
+    160
+  ],
+  "direction": "rtl",
+  "fontHashes": {},
+  "insets": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "locale": "en-US",
+  "logicalSize": [
+    160,
+    160
+  ],
+  "nodeId": "synthetic:screen:review",
+  "pixelSize": [
+    160,
+    160
+  ],
+  "platform": "synthetic",
+  "renderer": "pillow",
+  "scale": 1,
+  "schemaVersion": 1,
+  "sourceRevision": "synthetic-v1",
+  "textScale": 1,
+  "theme": "dark"
+}

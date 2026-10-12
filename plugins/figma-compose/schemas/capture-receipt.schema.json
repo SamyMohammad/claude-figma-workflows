@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "nodeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRevision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pixelSize": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "logicalSize": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "density": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "fontScale": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "direction": {
+      "enum": [
+        "ltr",
+        "rtl"
+      ]
+    },
+    "theme": {
+      "enum": [
+        "light",
+        "dark"
+      ]
+    },
+    "crop": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "insets": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "usedFontHashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "containsText": {
+      "type": "boolean"
+    },
+    "animation": {
+      "const": "settled"
+    },
+    "colorSpace": {
+      "const": "srgb"
+    },
+    "platform": {
+      "const": "android"
+    },
+    "renderer": {
+      "const": "robolectric-native"
+    },
+    "imageHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "targetBounds": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "clockAutoAdvance": {
+      "const": false
+    },
+    "versions": {
+      "type": "object",
+      "minProperties": 3,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "required": [
+        "sdk",
+        "roborazzi",
+        "robolectric"
+      ]
+    },
+    "themeIdentity": {
+      "type": "object",
+      "properties": {
+        "tokenHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "manifestHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "configHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "tokenHash",
+        "manifestHash",
+        "configHash"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "nodeId",
+    "sourceRevision",
+    "pixelSize",
+    "logicalSize",
+    "density",
+    "fontScale",
+    "locale",
+    "direction",
+    "theme",
+    "crop",
+    "insets",
+    "usedFontHashes",
+    "containsText",
+    "animation",
+    "colorSpace",
+    "platform",
+    "renderer",
+    "imageHash",
+    "targetBounds",
+    "clockAutoAdvance",
+    "versions",
+    "themeIdentity"
+  ],
+  "additionalProperties": false
+}

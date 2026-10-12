@@ -1,0 +1,13 @@
+{
+  "approvedAt": "2026-10-10T00:00:00Z",
+  "contentHash": "51ab36d4aa888d74cc3d7eb4677b69ad853abeedb8f3520068c65a5a8f4b0d57",
+  "deviations": [],
+  "evidence": "Declared vector fixture only; no live Figma approval",
+  "kind": "tokens",
+  "modes": [
+    "light",
+    "dark"
+  ],
+  "owner": "synthetic-fixture-author",
+  "schemaVersion": 1
+}

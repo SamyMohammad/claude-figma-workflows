@@ -1,0 +1,401 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "packageName": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*)(?:\\.(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*))*(?![\\s\\S])"
+    },
+    "themeDirectory": {
+      "type": "string",
+      "pattern": "^(?!/|.*[\\\\:]|.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[^\\x00-\\x1f<>\"|?*]+$"
+    },
+    "remBasePx": {
+      "anyOf": [
+        {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "names": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*)(?![\\s\\S])"
+      }
+    },
+    "material": {
+      "type": "object",
+      "properties": {
+        "colors": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onPrimary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "primaryContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onPrimaryContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inversePrimary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secondary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onSecondary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secondaryContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onSecondaryContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tertiary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onTertiary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tertiaryContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onTertiaryContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "background": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onBackground": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onSurface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceVariant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onSurfaceVariant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceTint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inverseSurface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inverseOnSurface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "error": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onError": {
+              "type": "string",
+              "minLength": 1
+            },
+            "errorContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "onErrorContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "outline": {
+              "type": "string",
+              "minLength": 1
+            },
+            "outlineVariant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scrim": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceBright": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceDim": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceContainer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceContainerHigh": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceContainerHighest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceContainerLow": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surfaceContainerLowest": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "typography": {
+          "type": "object",
+          "properties": {
+            "displayLarge": {
+              "type": "string",
+              "minLength": 1
+            },
+            "displayMedium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "displaySmall": {
+              "type": "string",
+              "minLength": 1
+            },
+            "headlineLarge": {
+              "type": "string",
+              "minLength": 1
+            },
+            "headlineMedium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "headlineSmall": {
+              "type": "string",
+              "minLength": 1
+            },
+            "titleLarge": {
+              "type": "string",
+              "minLength": 1
+            },
+            "titleMedium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "titleSmall": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bodyLarge": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bodyMedium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bodySmall": {
+              "type": "string",
+              "minLength": 1
+            },
+            "labelLarge": {
+              "type": "string",
+              "minLength": 1
+            },
+            "labelMedium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "labelSmall": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "shapes": {
+          "type": "object",
+          "properties": {
+            "extraSmall": {
+              "type": "string",
+              "minLength": 1
+            },
+            "small": {
+              "type": "string",
+              "minLength": 1
+            },
+            "medium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "large": {
+              "type": "string",
+              "minLength": 1
+            },
+            "extraLarge": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "colors",
+        "typography",
+        "shapes"
+      ],
+      "additionalProperties": false
+    },
+    "fonts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^(?:[1-9][0-9]{0,2}|1000)$"
+        },
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "resource": {
+              "type": "string",
+              "pattern": "^(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*)(?:\\.(?:[A-Za-z][A-Za-z0-9_]*|_+[A-Za-z0-9][A-Za-z0-9_]*))*(?![\\s\\S])"
+            },
+            "projectPath": {
+              "type": "string",
+              "pattern": "^(?!/|.*[\\\\:]|.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[^\\x00-\\x1f<>\"|?*]+$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "resource",
+            "projectPath",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "allowedMaterialDefaults": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "primary",
+          "onPrimary",
+          "primaryContainer",
+          "onPrimaryContainer",
+          "inversePrimary",
+          "secondary",
+          "onSecondary",
+          "secondaryContainer",
+          "onSecondaryContainer",
+          "tertiary",
+          "onTertiary",
+          "tertiaryContainer",
+          "onTertiaryContainer",
+          "background",
+          "onBackground",
+          "surface",
+          "onSurface",
+          "surfaceVariant",
+          "onSurfaceVariant",
+          "surfaceTint",
+          "inverseSurface",
+          "inverseOnSurface",
+          "error",
+          "onError",
+          "errorContainer",
+          "onErrorContainer",
+          "outline",
+          "outlineVariant",
+          "scrim",
+          "surfaceBright",
+          "surfaceDim",
+          "surfaceContainer",
+          "surfaceContainerHigh",
+          "surfaceContainerHighest",
+          "surfaceContainerLow",
+          "surfaceContainerLowest",
+          "displayLarge",
+          "displayMedium",
+          "displaySmall",
+          "headlineLarge",
+          "headlineMedium",
+          "headlineSmall",
+          "titleLarge",
+          "titleMedium",
+          "titleSmall",
+          "bodyLarge",
+          "bodyMedium",
+          "bodySmall",
+          "labelLarge",
+          "labelMedium",
+          "labelSmall",
+          "extraSmall",
+          "small",
+          "medium",
+          "large",
+          "extraLarge",
+          "colorScheme:unmapped",
+          "typography:unmapped",
+          "shapes:unmapped"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "packageName",
+    "themeDirectory",
+    "remBasePx",
+    "material",
+    "fonts",
+    "allowedMaterialDefaults"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

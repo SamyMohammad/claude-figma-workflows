@@ -1,0 +1,37 @@
+{
+  "allowedMaterialDefaults": [
+    "colorScheme:unmapped",
+    "typography:unmapped"
+  ],
+  "fonts": {
+    "Roboto": {
+      "400": {
+        "projectPath": "app/src/main/res/font/roboto_regular.ttf",
+        "resource": "dev.figma.fixture.R.font.roboto_regular",
+        "sha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134"
+      }
+    }
+  },
+  "material": {
+    "colors": {
+      "background": "color.background",
+      "onPrimary": "color.onPrimary",
+      "primary": "color.primary"
+    },
+    "shapes": {
+      "extraLarge": "shape.radius",
+      "extraSmall": "shape.radius",
+      "large": "shape.radius",
+      "medium": "shape.radius",
+      "small": "shape.radius"
+    },
+    "typography": {
+      "bodyLarge": "type.body"
+    }
+  },
+  "names": {},
+  "packageName": "dev.figma.fixture.core.theme",
+  "remBasePx": null,
+  "schemaVersion": 1,
+  "themeDirectory": "app/src/main/java/dev/figma/fixture/core/theme"
+}

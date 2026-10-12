@@ -1,0 +1,76 @@
+{
+  "configHash": "a613ab43bcdfaf47e8e7441f01f8810c73a6df1571235bda3ca789fd0fe33b46",
+  "files": {
+    "app/src/main/java/dev/figma/fixture/core/theme/AppTheme.kt": "a4374f9f324b6d9897960fe40c32caf2c8e79a7f78633c26be30a762e650b675",
+    "app/src/main/java/dev/figma/fixture/core/theme/AppThemeIdentity.kt": "556170d39aeb3447d79969ff0a78065db07ae128bdce129e977ace5d8e92ce2d",
+    "app/src/main/java/dev/figma/fixture/core/theme/AppTokenValues.kt": "00cc90458187d4aee374596457f2d650813bafc12aa0f0ddd262c5672880f28c",
+    "app/src/main/java/dev/figma/fixture/core/theme/AppTokens.kt": "4f7c1dd024dd2aa3d14e399d7ec5fe56b46240b762fba719de674b4ba8c1457a"
+  },
+  "generation": {
+    "allowedMaterialDefaults": [
+      "colorScheme:unmapped",
+      "typography:unmapped"
+    ],
+    "configHash": "a613ab43bcdfaf47e8e7441f01f8810c73a6df1571235bda3ca789fd0fe33b46",
+    "manifestHash": "450347ee6ae0694b734c870009ceed6be8013f6318aabeed26179f049e781a74",
+    "materialDefaults": {
+      "colors": [
+        "error",
+        "errorContainer",
+        "inverseOnSurface",
+        "inversePrimary",
+        "inverseSurface",
+        "onBackground",
+        "onError",
+        "onErrorContainer",
+        "onPrimaryContainer",
+        "onSecondary",
+        "onSecondaryContainer",
+        "onSurface",
+        "onSurfaceVariant",
+        "onTertiary",
+        "onTertiaryContainer",
+        "outline",
+        "outlineVariant",
+        "primaryContainer",
+        "scrim",
+        "secondary",
+        "secondaryContainer",
+        "surface",
+        "surfaceBright",
+        "surfaceContainer",
+        "surfaceContainerHigh",
+        "surfaceContainerHighest",
+        "surfaceContainerLow",
+        "surfaceContainerLowest",
+        "surfaceDim",
+        "surfaceTint",
+        "surfaceVariant",
+        "tertiary",
+        "tertiaryContainer"
+      ],
+      "shapes": [],
+      "typography": [
+        "bodyMedium",
+        "bodySmall",
+        "displayLarge",
+        "displayMedium",
+        "displaySmall",
+        "headlineLarge",
+        "headlineMedium",
+        "headlineSmall",
+        "labelLarge",
+        "labelMedium",
+        "labelSmall",
+        "titleLarge",
+        "titleMedium",
+        "titleSmall"
+      ]
+    },
+    "precision": "Compose Float channels, dp/sp and easing use IEEE-754 binary32; raw receipt retained unchanged.",
+    "tokenHash": "51ab36d4aa888d74cc3d7eb4677b69ad853abeedb8f3520068c65a5a8f4b0d57"
+  },
+  "manifestHash": "450347ee6ae0694b734c870009ceed6be8013f6318aabeed26179f049e781a74",
+  "schemaVersion": 1,
+  "tokenHash": "51ab36d4aa888d74cc3d7eb4677b69ad853abeedb8f3520068c65a5a8f4b0d57"
+}

@@ -6,6 +6,11 @@ import sqlite3
 import sys
 from pathlib import Path
 
+from .adapter_export import export_adapter
+from .approvals import require_approval
+from .documents import read_json
+from .paths import safe_path, check_collisions
+
 from .budget import mark_sent, reserve
 from .checkpoint import complete_node
 from .cli_bundle import audit, validate
@@ -21,7 +26,7 @@ class _Parser(argparse.ArgumentParser):
 def _parser():
     parser = _Parser(prog="figma-core")
     commands = parser.add_subparsers(dest="command", required=True, parser_class=_Parser)
-    for command in ("validate", "audit", "complete-node", "correction", "compare"):
+    for command in ("validate", "audit", "complete-node", "correction", "compare", "export-adapter"):
         part = commands.add_parser(command)
         part.add_argument("--bundle", type=Path, required=True)
         if command in ("complete-node", "correction"):
@@ -35,6 +40,13 @@ def _parser():
             for name in ("reference", "actual", "reference-meta", "actual-meta", "policy",
                          "policy-approval", "output"):
                 part.add_argument(f"--{name}", type=Path, required=True)
+    part = commands.add_parser("verify-approval")
+    part.add_argument("--document", type=Path, required=True)
+    part.add_argument("--approval", type=Path, required=True)
+    part.add_argument("--kind", required=True)
+    part = commands.add_parser("check-paths")
+    part.add_argument("--root", type=Path, required=True)
+    part.add_argument("--paths-json", required=True)
     part = commands.add_parser("reserve")
     part.add_argument("--ledger", type=Path, required=True)
     part.add_argument("--window", required=True)
@@ -50,6 +62,21 @@ def main(argv: list[str]) -> int:
     try:
         args = _parser().parse_args(argv)
         match args.command:
+            case "export-adapter":
+                result = export_adapter(args.bundle)
+            case "verify-approval":
+                require_approval(read_json(args.document), read_json(args.approval), args.kind)
+                result = {"status": "passed"}
+            case "check-paths":
+                try:
+                    paths = json.loads(args.paths_json)
+                except (ValueError, TypeError):
+                    raise CoreError("PATH_INVALID", "Expected JSON path array") from None
+                if not isinstance(paths, list) or any(not isinstance(path, str) for path in paths):
+                    raise CoreError("PATH_INVALID", "Expected JSON path array")
+                destinations = [str(safe_path(args.root, path)) for path in paths]
+                check_collisions(paths)
+                result = {"status": "passed", "paths": destinations}
             case "validate":
                 result = validate(args.bundle)
             case "audit":
